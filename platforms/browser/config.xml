@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.phonegap.comparee" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+    <feature name="Camera">
+        <param name="browser-package" value="Camera" />
+    </feature>
+    <feature name="Device">
+        <param name="browser-package" value="Device" />
+    </feature>
+    <name>compare at</name>
+    <description>Hello World sample application that responds to the deviceready event.</description>
+    <author email="support@phonegap.com" href="http://phonegap.com">PhoneGap Team</author>
+    <content src="index.html" />
+    <icon src="icon.png" />
+    <icon height="180" platform="ios" src="res/icon/ios/icon-60@3x.png" width="180" />
+    <icon height="180" platform="ios" src="icon-60@3x.png" width="180" />
+    <icon height="60" platform="ios" src="icon-60.png" width="60" />
+    <icon height="120" platform="ios" src="icon-60@2x.png" width="120" />
+    <icon height="76" platform="ios" src="icon-76.png" width="76" />
+    <icon height="152" platform="ios" src="icon-76@2x.png" width="152" />
+    <icon height="167" platform="ios" src="icon-83.5@2x.png" width="167" />
+    <icon height="29" platform="ios" src="icon-small.png" width="29" />
+    <icon height="58" platform="ios" src="icon-small@2x.png" width="58" />
+    <icon height="87" platform="ios" src="icon-small@3x.png" width="87" />
+    <icon height="40" platform="ios" src="icon-40.png" width="40" />
+    <icon height="80" platform="ios" src="icon-40@2x.png" width="80" />
+    <icon height="120" platform="ios" src="icon-40@3x.png" width="120" />
+    <icon platform="android" qualifier="ldpi" src="ldpi.png" />
+    <icon platform="android" qualifier="mdpi" src="mdpi.png" />
+    <icon platform="android" qualifier="hdpi" src="hdpi.png" />
+    <icon platform="android" qualifier="xhdpi" src="xhdpi.png" />
+    <icon platform="android" qualifier="xxhdpi" src="xxhdpi.png" />
+    <icon platform="android" qualifier="fr-xxhdpi" src="fr-xxhdpi.png" />
+    <icon gap:platform="webos" src="www/res/icon/webos/icon-64.png" />
+    <splash src="splash.png" />
+    <splash height="480" platform="ios" src="Default.png" width="320" />
+    <splash height="960" platform="ios" src="Default@2x.png" width="640" />
+    <splash height="1136" platform="ios" src="Default-568h@2x.png" width="640" />
+    <splash height="1334" platform="ios" src="Default-667h@2x.png" width="750" />
+    <splash height="2208" platform="ios" src="Default-Portrait-736h@3x.png" width="1242" />
+    <splash height="1242" platform="ios" src="Default-Landscape-736h@3x.png" width="2208" />
+    <splash height="1024" platform="ios" src="Default-Portrait.png" width="768" />
+    <splash height="768" platform="ios" src="Default-Landscape.png" width="1024" />
+    <splash height="2048" platform="ios" src="Default-Portrait@2x.png" width="1536" />
+    <splash height="1536" platform="ios" src="Default-Landscape@2x.png" width="2048" />
+    <splash platform="android" qualifier="ldpi" src="ldpi.png" />
+    <splash platform="android" qualifier="mdpi" src="mdpi.png" />
+    <splash platform="android" qualifier="hdpi" src="hdpi.png" />
+    <splash platform="android" qualifier="xhdpi" src="xhdpi.png" />
+    <splash platform="android" qualifier="fr-xhdpi" src="fr-xhdpi.png" />
+    <splash platform="android" qualifier="port-xxhdpi" src="portrait-xxhdpi.png" />
+    <splash platform="android" qualifier="land-xxhdpi" src="landscape-xxhdpi.png" />
+    <splash platform="winphone" src="splash/winphone/splash.jpg" />
+    <splash height="1920" platform="winphone" src="res/SplashScreenPhone.scale-240.png" width="1152" />
+    <splash height="300" platform="winphone" src="res/SplashScreen.scale-100.png" width="620" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <preference name="webviewbounce" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="permissions" value="none" />
+    <preference name="orientation" value="default" />
+    <preference name="target-device" value="universal" />
+    <preference name="fullscreen" value="true" />
+    <preference name="prerendered-icon" value="true" />
+    <preference name="stay-in-webview" value="false" />
+    <preference name="ios-statusbarstyle" value="black-opaque" />
+    <preference name="detect-data-types" value="true" />
+    <preference name="exit-on-suspend" value="false" />
+    <preference name="show-splash-screen-spinner" value="true" />
+    <preference name="auto-hide-splash-screen" value="true" />
+    <preference name="disable-cursor" value="false" />
+    <preference name="android-minSdkVersion" value="14" />
+    <preference name="android-installLocation" value="auto" />
+    <preference name="phonegap-version" value="cli-6.5.0" />
+</widget>
