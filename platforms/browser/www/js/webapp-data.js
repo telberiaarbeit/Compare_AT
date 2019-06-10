@@ -6,7 +6,25 @@
  Licensed under the MIT License:
  http://www.opensource.org/licenses/mit-license.php
  */
+function convertMathCharacters(str){
+     var les = '<=';
+     var ge = '>=';
+     var plus = "+-";
 
+     var find = '≤';
+     var re = new RegExp(find, 'g');
+     str = str.replace(re, les);
+
+     find = '≥';
+     re = new RegExp(find, 'g');
+     str = str.replace(re, ge);
+
+     find = '±';
+     re = new RegExp(find, 'g');
+     str = str.replace(re, plus);
+
+     return str;
+ }
  $j(function () {
 
     var dcoachDB = {
@@ -1695,18 +1713,23 @@
 
                 var parray = [];
                 var carray = [];
+                var txtValue1 = $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text();
+                var txtValue2 = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text();
 
-                parray.push($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text());
+                txtValue1 = convertMathCharacters(txtValue1);
+                txtValue2 = convertMathCharacters(txtValue2);           
+                parray.push(txtValue1,txtValue2);
                 $j('#sortable .webapp-cproduct-value').each(function (j) {
 
                     if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
-                        carray.push($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text());
+                        var txtVal2 = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
+                        txtVal2 = convertMathCharacters(txtVal2);
+                        carray.push(txtVal2);
                     }
 
                 });
 
                 rowsarray.push($j.merge($j.merge([], parray), carray));
-
             });
 
             var columns = columnsarray;
@@ -1814,17 +1837,26 @@
 
                 var parray = [];
                 var carray = [];
+                var txtValue1 = $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text();
+                var txtValue2 = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text();
 
-                parray.push($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text());
-                $j('#sortable .webapp-cproduct-value').each(function (j) {
+                txtValue1 = convertMathCharacters(txtValue1);
+                txtValue2 = convertMathCharacters(txtValue2);           
+                parray.push(txtValue1,txtValue2);
 
-                    if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
-                        carray.push($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text());
-                    }
+               // parray.push($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text());
+               $j('#sortable .webapp-cproduct-value').each(function (j) {
 
-                });
+                if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
+                     //var txtVal = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
+                     var txtVal2 = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
+                     txtVal2 = convertMathCharacters(txtVal2);
+                     carray.push(txtVal2);
+                 }
 
-                rowsarray.push($j.merge($j.merge([], parray), carray));
+             });
+
+               rowsarray.push($j.merge($j.merge([], parray), carray));
 
             });
 
