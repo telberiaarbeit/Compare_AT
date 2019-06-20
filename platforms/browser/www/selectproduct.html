@@ -1,85 +1,87 @@
 <!DOCTYPE html>
 <!--[if lt IE 7]>
-<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+    <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>
-<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+    <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>
-<html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js"> <!--<![endif]-->
+    <html class="no-js lt-ie9"> <![endif]-->
+    <!--[if gt IE 8]><!-->
+    <html class="no-js"> <!--<![endif]-->
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>CSLB Compare Frontend Panel</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="user-scalable=no, width=device-width">
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="css/jquery.mobile-1.4.5.css" rel="stylesheet" type="text/css"/>
-    <link href="css/custom.css" rel="stylesheet" type="text/css"/>
-    <script src="js/jquery-1.10.2.js"></script>
-    <script src="js/jquery-ui.js"></script>
-    <script src="js/jquery.mobile-1.4.5.min.js"></script>
-    <script src="js/jquery.ui.touch-punch.min.js"></script>
-    <script src="js/highlightRegex.js"></script>
-    <script src='js/libs/require/require.js'></script>
-    <script src='js/libs/require/config.js'></script>
-    <script src="js/jspdf.js"></script>
-    <script src='js/plugins/autotable.js'></script>
-    <script src='js/plugins/standard_fonts_metrics.js'></script>
-    <script src='js/plugins/split_text_to_size.js'></script>
-    <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/inside.js"></script>
-    <script src="js/webapp-data.js"></script>
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>CSLB Compare Frontend Panel</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="user-scalable=no, width=device-width">
+        <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="css/jquery.mobile-1.4.5.css" rel="stylesheet" type="text/css"/>
+        <link href="css/custom.css" rel="stylesheet" type="text/css"/>
+        <script src="js/jquery-1.10.2.js"></script>
+        <script src="js/jquery-ui.js"></script>
+        <script src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/jquery.ui.touch-punch.min.js"></script>
+        <script src="js/highlightRegex.js"></script>
+        <script src='js/libs/require/require.js'></script>
+        <script src='js/libs/require/config.js'></script>
+        <script src="js/jspdf.js"></script>
+        <script src='js/plugins/autotable.js'></script>
+        <script src='js/plugins/standard_fonts_metrics.js'></script>
+        <script src='js/plugins/split_text_to_size.js'></script>
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/inside.js"></script>
+        <script src="js/webapp-data.js"></script>
+        <script src="js/aes.js"></script>
 
-        ::-webkit-scrollbar {
-            -webkit-appearance: none;
-        }
+        <style>
 
-        ::-webkit-scrollbar:vertical {
-            width: 12px;
-        }
+            ::-webkit-scrollbar {
+                -webkit-appearance: none;
+            }
 
-        ::-webkit-scrollbar:horizontal {
-            height: 12px;
-        }
+            ::-webkit-scrollbar:vertical {
+                width: 12px;
+            }
 
-        ::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, .5);
-            border-radius: 10px;
-            border: 2px solid #ffffff;
-        }
+            ::-webkit-scrollbar:horizontal {
+                height: 12px;
+            }
 
-        ::-webkit-scrollbar-track {
-            border-radius: 10px;
-            background-color: #ffffff;
-        }
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, .5);
+                border-radius: 10px;
+                border: 2px solid #ffffff;
+            }
 
-        .box-three {
-            overflow-x: scroll;
-            -webkit-overflow-scrolling: touch;
-            padding: 30px 0;
-        }
+            ::-webkit-scrollbar-track {
+                border-radius: 10px;
+                background-color: #ffffff;
+            }
 
-        #sortable {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
+            .box-three {
+                overflow-x: scroll;
+                -webkit-overflow-scrolling: touch;
+                padding: 30px 0;
+            }
 
-        #sortable li {
-            margin: 0px 1px 0px 0;
-            padding: 0px;
-            float: left;
-            width: 162px;
-            font-size: 4em;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
+            #sortable {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #sortable li {
+                margin: 0px 1px 0px 0;
+                padding: 0px;
+                float: left;
+                width: 162px;
+                font-size: 4em;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
 
 <!--[if lt IE 7]>
 <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
@@ -93,11 +95,11 @@
         <div class="container webapp-container">
             <div class="row">
                 <div class="col-xs-8" style="margin-left:-20px; margin-bottom:40px;"><img src="img/webapp-logo.jpg"
-                                                                                          class="webapp-logo"/><img
-                        src="" id="dwnldImg" style="display: none"/></div>
+                  class="webapp-logo"/><img
+                  src="" id="dwnldImg" style="display: none"/></div>
 
 
-                <div class="col-xs-3" style="margin-right:-20px; margin-bottom:0px;"><a class="topbutton">
+                  <div class="col-xs-3" style="margin-right:-20px; margin-bottom:0px;"><a class="topbutton">
                     <button class="webapp-logo" style="background-color: #0b7e79;color: #fff;">Daten abrufen</button>
                 </a></div>
             </div>
@@ -115,26 +117,26 @@
                     <div class="webapp-navbar-tab">
                         <ul class="ui-grid-c">
                             <li id="firsttab"><a href="#one" data-theme="a" data-role="tab" data-ajax="false">CSL
-                                Behring Produkte</a></li>
+                            Behring Produkte</a></li>
                             <li id="secondtab"><a href="#two" data-theme="a" data-role="tab" data-ajax="false">Konkurrenzprodukte</a>
                             </li>
                             <li id="thirdtab"><a href="#three" data-theme="a" data-role="tab" data-ajax="false">Eigenschaften</a>
                             </li>
                             <li id="fourtab"><a href="#four" data-role="tab" data-theme="a"
-                                                data-ajax="false">Vergleich</a></li>
-                            <li><a href="#five" data-theme="a" data-role="tab" data-ajax="false"
-                                   style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Daten
-                                abrufen</a></li>
-                            <li><a href="#six" data-theme="a" data-role="tab" data-ajax="false"
-                                   style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Vergleich</a>
-                            </li>
-                            <li><a href="#seven" data-theme="a" data-role="tab" data-ajax="false"
-                                   style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Vergleich</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-xs-12 center-block">
+                                data-ajax="false">Vergleich</a></li>
+                                <li><a href="#five" data-theme="a" data-role="tab" data-ajax="false"
+                                 style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Daten
+                             abrufen</a></li>
+                             <li><a href="#six" data-theme="a" data-role="tab" data-ajax="false"
+                                 style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Vergleich</a>
+                             </li>
+                             <li><a href="#seven" data-theme="a" data-role="tab" data-ajax="false"
+                                 style="width:1px; opacity:0; margin:0px; padding:0px; position:absolute;">Vergleich</a>
+                             </li>
+                         </ul>
+                     </div>
+                 </div>
+                 <div class="col-xs-12 center-block">
                     <!-- TAB CONTENT START -->
 
                     <!-- TAB ONE -->
@@ -157,81 +159,81 @@
                         <!-- TAB SYNC -->
 
                         <div class="row row-eq-height webapp-product-sync-row"
-                             style="visibility:hidden; position:absolute;">
-                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-sync">
-                                <div class="row">
-                                    <div class="col-xs-12 text-center webapp-product-sync-content"></div>
+                        style="visibility:hidden; position:absolute;">
+                        <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-sync">
+                            <div class="row">
+                                <div class="col-xs-12 text-center webapp-product-sync-content"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center"><br/>
+                                    <a class="webapp-button show-page-loading-msg" id="webapp-product-sync-but"
+                                    style="margin-left:auto; margin-right:auto;" data-textonly="false"
+                                    data-textvisible="false" data-msgtext="" data-inline="true">Daten abrufen</a>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xs-12 text-center"><br/>
-                                        <a class="webapp-button show-page-loading-msg" id="webapp-product-sync-but"
-                                           style="margin-left:auto; margin-right:auto;" data-textonly="false"
-                                           data-textvisible="false" data-msgtext="" data-inline="true">Daten abrufen</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB LIST -->
+                    <div id="loading-img">
+                        <img src="img/reload.svg"/>
+                        <h3>Laden...</h3>
+                    </div>
+
+                    <ul data-role="listview" data-filter="true" data-inset="true" data-input="#webapp-product-list"
+                    id="webapp-product-data" class="ui-listview ui-listview-inset ui-corner-all">
+                    <li class="ui-li-has-thumb ui-first-child"></li>
+                </ul>
+                <!-- TAB LIST END -->
+                        <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
+                        --> </div>
+
+                        <!-- TAB TWO -->
+                        <div id="two" class="ui-content">
+
+                            <!-- TAB HEADING -->
+
+                            <div class="row row-eq-height webapp-tab-heading">
+                                <div class="col-xs-12 col-sm-9 col-lg-9">
+                                    <h1>Konkurrenzprodukte auswählen</h1>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-3 col-lg-3">
+                                    <div class="inner-addon right-addon">
+                                        <form class="ui-filterable" _lpchecked="1">
+                                            <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
+                                            <input id="webapp-product-company-list" class="webapp-search"
+                                            data-type="search">
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
+                                <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
+                                    src="img/webapp-product1.png"/></div>
+                                    <div class="col-xs-12 col-sm-3 col-lg-3 text-left webapp-product-title webapp-verticle-align-bottom">
+                                        <h4>Produkt Name</h4>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6 col-lg-6 text-left"
+                                    style="margin-left: 80px;margin-bottom: 10px;">
+                                    <br>
+                                    <a class="webapp-button webapp-button-weiter webapp-product-attr-but">Weiter</a>
 
-                        <!-- TAB LIST -->
-                        <div id="loading-img">
-                            <img src="img/reload.svg"/>
-                            <h3>Laden...</h3>
-                        </div>
-
-                        <ul data-role="listview" data-filter="true" data-inset="true" data-input="#webapp-product-list"
-                            id="webapp-product-data" class="ui-listview ui-listview-inset ui-corner-all">
-                            <li class="ui-li-has-thumb ui-first-child"></li>
-                        </ul>
-                        <!-- TAB LIST END -->
-                        <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
-            --> </div>
-
-                    <!-- TAB TWO -->
-                    <div id="two" class="ui-content">
-
-                        <!-- TAB HEADING -->
-
-                        <div class="row row-eq-height webapp-tab-heading">
-                            <div class="col-xs-12 col-sm-9 col-lg-9">
-                                <h1>Konkurrenzprodukte auswählen</h1>
-                            </div>
-
-                            <div class="col-xs-12 col-sm-3 col-lg-3">
-                                <div class="inner-addon right-addon">
-                                    <form class="ui-filterable" _lpchecked="1">
-                                        <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
-                                        <input id="webapp-product-company-list" class="webapp-search"
-                                               data-type="search">
-                                    </form>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
-                            <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
-                                    src="img/webapp-product1.png"/></div>
-                            <div class="col-xs-12 col-sm-3 col-lg-3 text-left webapp-product-title webapp-verticle-align-bottom">
-                                <h4>Produkt Name</h4>
-                            </div>
-                            <div class="col-xs-12 col-sm-6 col-lg-6 text-left"
-                                 style="margin-left: 80px;margin-bottom: 10px;">
-                                <br>
-                                <a class="webapp-button webapp-button-weiter webapp-product-attr-but">Weiter</a>
 
-                            </div>
-                        </div>
+                            <!-- CHECK SELECT/UNSELECT -->
 
-                        <!-- CHECK SELECT/UNSELECT -->
-
-                        <div class="row row-eq-height webapp-tab-heading webapp-product-check">
-                            <div class="col-xs-12 col-sm-12 col-lg-12"> Auswahl: <a class="webapp-button-check"
-                                                                                    data-check="webapp-product-com-list">Alles
+                            <div class="row row-eq-height webapp-tab-heading webapp-product-check">
+                                <div class="col-xs-12 col-sm-12 col-lg-12"> Auswahl: <a class="webapp-button-check"
+                                    data-check="webapp-product-com-list">Alles
                                 auswählen</a> | <a class="webapp-button-uncheck" data-check="webapp-product-com-list">Alles
                                 aufheben</a></div>
-                        </div>
+                            </div>
 
-                        <!-- TAB LIST -->
+                            <!-- TAB LIST -->
 
-                        <ul data-role="listview" data-filter="true" data-inset="true"
+                            <ul data-role="listview" data-filter="true" data-inset="true"
                             data-input="#webapp-product-company-list" id="webapp-product-com-list"
                             class="ui-listview ui-listview-inset ui-corner-all">
                             <li class="ui-li-has-thumb ui-first-child">
@@ -248,56 +250,56 @@
                         <div class="row">
                             <div class="col-xs-12 text-center"><br/>
                                 <a class="webapp-button webapp-button-weiter webapp-product-attr-but"
-                                   style="margin-left:auto; margin-right:auto;">Weiter</a></div>
-                        </div>
-                        <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
-            --> </div>
-
-                    <!-- TAB THREE -->
-                    <div id="three" class="ui-content">
-
-                        <!-- TAB HEADING -->
-
-                        <div class="row row-eq-height webapp-tab-heading">
-                            <div class="col-xs-12 col-sm-9 col-lg-9">
-                                <h1>Eigenschaften auswählen</h1>
+                                style="margin-left:auto; margin-right:auto;">Weiter</a></div>
                             </div>
+                        <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
+                        --> </div>
 
-                            <div class="col-xs-12 col-sm-3 col-lg-3">
-                                <div class="inner-addon right-addon">
-                                    <form class="ui-filterable" _lpchecked="1">
-                                        <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
-                                        <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
-                                    </form>
+                        <!-- TAB THREE -->
+                        <div id="three" class="ui-content">
+
+                            <!-- TAB HEADING -->
+
+                            <div class="row row-eq-height webapp-tab-heading">
+                                <div class="col-xs-12 col-sm-9 col-lg-9">
+                                    <h1>Eigenschaften auswählen</h1>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-3 col-lg-3">
+                                    <div class="inner-addon right-addon">
+                                        <form class="ui-filterable" _lpchecked="1">
+                                            <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
+                                            <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
-                            <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
+                            <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
+                                <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
                                     src="img/webapp-product1.png"/></div>
-                            <div class="col-xs-12 col-sm-3 col-lg-3 text-left webapp-product-title webapp-verticle-align-bottom">
-                                <h4>Product Image Name</h4>
+                                    <div class="col-xs-12 col-sm-3 col-lg-3 text-left webapp-product-title webapp-verticle-align-bottom">
+                                        <h4>Product Image Name</h4>
+                                    </div>
+
+                                    <div class="col-xs-12 col-sm-6 col-lg-6 text-left"
+                                    style="margin-left: 80px;margin-bottom: 10px;">
+                                    <br>
+                                    <a class="webapp-button webapp-button-weiter webapp-product-compare-but" >Weiter</a>
+                                </div>
                             </div>
 
-                            <div class="col-xs-12 col-sm-6 col-lg-6 text-left"
-                                 style="margin-left: 80px;margin-bottom: 10px;">
-                                <br>
-                                <a class="webapp-button webapp-button-weiter webapp-product-compare-but" >Weiter</a>
-                            </div>
-                        </div>
+                            <!-- CHECK SELECT/UNSELECT -->
 
-                        <!-- CHECK SELECT/UNSELECT -->
-
-                        <div class="row row-eq-height webapp-tab-heading webapp-product-check">
-                            <div class="col-xs-12 col-sm-12 col-lg-12"> Auswahl: <a class="webapp-button-check"
-                                                                                    data-check="webapp-product-attr-ul">Alles
+                            <div class="row row-eq-height webapp-tab-heading webapp-product-check">
+                                <div class="col-xs-12 col-sm-12 col-lg-12"> Auswahl: <a class="webapp-button-check"
+                                    data-check="webapp-product-attr-ul">Alles
                                 auswählen</a> | <a class="webapp-button-uncheck" data-check="webapp-product-attr-ul">Alles
                                 aufheben</a></div>
-                        </div>
+                            </div>
 
-                        <!-- TAB LIST -->
+                            <!-- TAB LIST -->
 
-                        <ul data-role="listview" data-filter="true" data-inset="true"
+                            <ul data-role="listview" data-filter="true" data-inset="true"
                             data-input="#webapp-product-attr-list" id="webapp-product-attr-ul"
                             class="ui-listview ui-listview-inset ui-corner-all">
                             <li class="ui-li-has-thumb ui-first-child">
@@ -314,191 +316,191 @@
                         <div class="row">
                             <div class="col-xs-12 text-center"><br/>
                                 <a class="webapp-button webapp-button-weiter webapp-product-compare-but"
-                                   style="margin-left:auto; margin-right:auto;">Weiter</a></div>
-                        </div>
+                                style="margin-left:auto; margin-right:auto;">Weiter</a></div>
+                            </div>
                         <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
-            --> </div>
+                        --> </div>
 
-                    <!-- TAB FOUR -->
+                        <!-- TAB FOUR -->
 
-                    <div id="four" class="ui-content">
+                        <div id="four" class="ui-content">
 
-                        <!-- TAB HEADING -->
+                            <!-- TAB HEADING -->
 
-                        <div class="row row-eq-height webapp-tab-heading">
-                            <div class="col-xs-12 col-sm-5 col-lg-5">
-                                <h1>Produktvergleich</h1>
-                            </div>
-                            <div class="col-xs-12 col-sm-4 col-lg-4 text-right">
-                                <select name="select-choice-1" id="select-choice-1">
-                                    <option value="0" selected>Optionen</option>
-                                    <!--<option value="1">Ansicht einstellen</option>-->
-                                    <option value="1">Als PDF speichern</option>
-                                    <option value="3">Daten abrufen</option>
-                                </select>
-                            </div>
-                            <div class="col-xs-12 col-sm-3 col-lg-3">
-                                <div class="inner-addon right-addon">
-                                    <form class="ui-filterable" _lpchecked="1">
-                                        <input id="webapp-product-compare-list" class="webapp-search"
-                                               data-type="search">
-                                    </form>
+                            <div class="row row-eq-height webapp-tab-heading">
+                                <div class="col-xs-12 col-sm-5 col-lg-5">
+                                    <h1>Produktvergleich</h1>
+                                </div>
+                                <div class="col-xs-12 col-sm-4 col-lg-4 text-right">
+                                    <select name="select-choice-1" id="select-choice-1">
+                                        <option value="0" selected>Optionen</option>
+                                        <!--<option value="1">Ansicht einstellen</option>-->
+                                        <option value="1">Als PDF speichern</option>
+                                        <option value="3">Daten abrufen</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-12 col-sm-3 col-lg-3">
+                                    <div class="inner-addon right-addon">
+                                        <form class="ui-filterable" _lpchecked="1">
+                                            <input id="webapp-product-compare-list" class="webapp-search"
+                                            data-type="search">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
-                            <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
+                            <div class="row row-eq-height webapp-tab-heading webapp-product-detail webapp-verticle-align">
+                                <div class="col-xs-12 col-sm-3 col-lg-3 webapp-product-image"><img
                                     src="img/webapp-product1.png"/></div>
-                            <div class="col-xs-12 col-sm-9 col-lg-9 text-left webapp-product-title webapp-verticle-align-bottom">
-                                <h4>Product Image Name</h4>
-                            </div>
-                        </div>
-
-                        <!-- TAB PRODUCT NAME -->
-
-                        <ul data-role="listview" data-filter="true" data-inset="true"
-                            data-input="#webapp-product-compare-list" id="webapp-product-compare-listview"
-                            class="ui-listview ui-listview-inset ui-corner-all">
-                            <li class="ui-li-has-thumb ui-first-child">
-                                <div class="box box-three">
-                                    <div class="webapp-tab-heading">
-                                        <div class="webapp-dproduct-name-property webapp-nopadding"
-                                             style="width:125px; float:left;"></div>
-                                        <div class="webapp-dproduct-name-value webapp-nopadding"
-                                             style="width:132px; float:left;"></div>
-                                        <ul id="sortable">
-
-                                            <li class="webapp-cproduct-name-value-1 webapp-nopadding ui-state-default webapp-cproduct-value" style="position: relative;"></li>
-                                            <li class="webapp-cproduct-name-value-2 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
-                                            <li class="webapp-cproduct-name-value-3 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
-                                            <li class="webapp-cproduct-name-value-4 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
-                                            <li class="webapp-cproduct-name-value-5 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
-                                        </ul>
+                                    <div class="col-xs-12 col-sm-9 col-lg-9 text-left webapp-product-title webapp-verticle-align-bottom">
+                                        <h4>Product Image Name</h4>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
 
-                        <!-- TAB LIST END -->
+                                <!-- TAB PRODUCT NAME -->
+
+                                <ul data-role="listview" data-filter="true" data-inset="true"
+                                data-input="#webapp-product-compare-list" id="webapp-product-compare-listview"
+                                class="ui-listview ui-listview-inset ui-corner-all">
+                                <li class="ui-li-has-thumb ui-first-child">
+                                    <div class="box box-three">
+                                        <div class="webapp-tab-heading">
+                                            <div class="webapp-dproduct-name-property webapp-nopadding"
+                                            style="width:125px; float:left;"></div>
+                                            <div class="webapp-dproduct-name-value webapp-nopadding"
+                                            style="width:132px; float:left;"></div>
+                                            <ul id="sortable">
+
+                                                <li class="webapp-cproduct-name-value-1 webapp-nopadding ui-state-default webapp-cproduct-value" style="position: relative;"></li>
+                                                <li class="webapp-cproduct-name-value-2 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
+                                                <li class="webapp-cproduct-name-value-3 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
+                                                <li class="webapp-cproduct-name-value-4 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
+                                                <li class="webapp-cproduct-name-value-5 webapp-nopadding ui-state-default webapp-cproduct-value"></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <!-- TAB LIST END -->
                         <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
-            --> </div>
+                        --> </div>
 
-                    <!-- TAB FIVE -->
+                        <!-- TAB FIVE -->
 
-                    <div id="five" class="ui-content">
+                        <div id="five" class="ui-content">
 
-                        <!-- TAB HEADING -->
+                            <!-- TAB HEADING -->
 
-                        <div class="row row-eq-height webapp-tab-heading">
-                            <div class="col-xs-12 col-sm-9 col-lg-9">
-                                <h1>Daten abrufen</h1>
-                            </div>
-                            <div class="col-xs-12 col-sm-3 col-lg-3">
-                                <div class="inner-addon right-addon">
-                                    <form class="ui-filterable" _lpchecked="1">
-                                        <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
-                                        <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
-                                    </form>
+                            <div class="row row-eq-height webapp-tab-heading">
+                                <div class="col-xs-12 col-sm-9 col-lg-9">
+                                    <h1>Daten abrufen</h1>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB CONTENT -->
-
-                        <div class="row row-eq-height">
-                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-sync">
-                                <div class="row">
-                                    <div class="col-xs-12 text-center">
-                                        <h4>Bitte warten. Neue Daten werden abgerufen</h4>
+                                <div class="col-xs-12 col-sm-3 col-lg-3">
+                                    <div class="inner-addon right-addon">
+                                        <form class="ui-filterable" _lpchecked="1">
+                                            <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
+                                            <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xs-12 text-center"><br/>
-                                        <a class="webapp-button show-page-loading-msg" id="webapp-product-sync-cancel"
-                                           style="margin-left:auto; margin-right:auto;">Abbrechen</a></div>
-                                </div>
                             </div>
-                        </div>
+
+                            <!-- TAB CONTENT -->
+
+                            <div class="row row-eq-height">
+                                <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-sync">
+                                    <div class="row">
+                                        <div class="col-xs-12 text-center">
+                                            <h4>Bitte warten. Neue Daten werden abgerufen</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 text-center"><br/>
+                                            <a class="webapp-button show-page-loading-msg" id="webapp-product-sync-cancel"
+                                            style="margin-left:auto; margin-right:auto;">Abbrechen</a></div>
+                                        </div>
+                                    </div>
+                                </div>
                         <!--          <div class="col-xs-12 webapp-margin-top text-center"> <a href="#" id="backToTopBtn" class="well well-sm pull-right"><img src="img/backtootp.png" width="12" height="12" /></a> </div>
-            --> </div>
+                        --> </div>
 
-                    <!-- TAB END -->
+                        <!-- TAB END -->
 
-                    <!-- TAB SIX -->
+                        <!-- TAB SIX -->
 
-                    <div id="six" class="ui-content">
+                        <div id="six" class="ui-content">
 
-                        <!-- TAB HEADING -->
+                            <!-- TAB HEADING -->
 
-                        <div class="row row-eq-height webapp-tab-heading">
-                            <div class="col-xs-12 col-sm-9 col-lg-9">
-                                <h1>Als PDF speichern</h1>
-                            </div>
-                            <div class="col-xs-12 col-sm-3 col-lg-3">
-                                <div class="inner-addon right-addon">
-                                    <form class="ui-filterable" _lpchecked="1">
-                                        <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
-                                        <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
-                                    </form>
+                            <div class="row row-eq-height webapp-tab-heading">
+                                <div class="col-xs-12 col-sm-9 col-lg-9">
+                                    <h1>Als PDF speichern</h1>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB CONTENT -->
-
-                        <div class="row row-eq-height">
-                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-pdf">
-                                <div class="row">
-                                    <div class="col-xs-12 text-center">
-                                        <h4>Wählen Sie das Format</h4>
+                                <div class="col-xs-12 col-sm-3 col-lg-3">
+                                    <div class="inner-addon right-addon">
+                                        <form class="ui-filterable" _lpchecked="1">
+                                            <!--<a href="#" tabindex="-1" aria-hidden="true" class="ui-input-clear ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" title="Clear text">Clear text</a>-->
+                                            <input id="webapp-product-attr-list" class="webapp-search" data-type="search">
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xs-12 webapp-verticle-align webapp-pdf-content"><br/>
-                                        <div class="col-xs-5 text-left webapp-verticle-align-bottom"><a class="pdf-pot"
-                                                                                                        style="cursor:pointer;"><img
+                            </div>
+
+                            <!-- TAB CONTENT -->
+
+                            <div class="row row-eq-height">
+                                <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 text-center center-block webapp-product-pdf">
+                                    <div class="row">
+                                        <div class="col-xs-12 text-center">
+                                            <h4>Wählen Sie das Format</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 webapp-verticle-align webapp-pdf-content"><br/>
+                                            <div class="col-xs-5 text-left webapp-verticle-align-bottom"><a class="pdf-pot"
+                                                style="cursor:pointer;"><img
                                                 src="img/pdf1.png" alt="pdf1"/></a><br/>
-                                            A4 Querformat ideal zur Darstellung von mehr Spalten
-                                        </div>
-                                        <div class="col-xs-5 text-left webapp-verticle-align-bottom"><a class="pdf-land"
-                                                                                                        style="cursor:pointer;"><img
+                                                A4 Querformat ideal zur Darstellung von mehr Spalten
+                                            </div>
+                                            <div class="col-xs-5 text-left webapp-verticle-align-bottom"><a class="pdf-land"
+                                                style="cursor:pointer;"><img
                                                 src="img/pdf2.png" alt="pdf2"/></a><br/>
-                                            A4 Hochformat ideal zur Darstellung von mehr Eigenschaften
+                                                A4 Hochformat ideal zur Darstellung von mehr Eigenschaften
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TAB END -->
                     </div>
-
-                    <!-- TAB END -->
                 </div>
-            </div>
-            <div class="col-xs-12 webapp-margin-top text-center webapp-margin-bottom"><a href="#top" id="backToTopBtn"
-                                                                                         data-role="button"
-                                                                                         class="well well-sm pull-right"
-                                                                                         data-theme="a"><img
-                    src="img/backtootp.png"/></a></div>
-        </div>
-    </div>
-    <!-- FOOTER -->
+                <div class="col-xs-12 webapp-margin-top text-center webapp-margin-bottom"><a href="#top" id="backToTopBtn"
+                   data-role="button"
+                   class="well well-sm pull-right"
+                   data-theme="a"><img
+                   src="img/backtootp.png"/></a></div>
+               </div>
+           </div>
+           <!-- FOOTER -->
 
-    <div class="container footer-container">
-        <div class="webapp-footer">
-            <div class="row">
-                <div class="col-xs-12 webapp-footer-image"><img src="img/webapp-frontend-bottom.png"
-                                                                class="webapp-footer-background"/></div>
-            </div>
-            <div class="row webapp-footer-text">
+           <div class="container footer-container">
+            <div class="webapp-footer">
+                <div class="row">
+                    <div class="col-xs-12 webapp-footer-image"><img src="img/webapp-frontend-bottom.png"
+                        class="webapp-footer-background"/></div>
+                    </div>
+                    <div class="row webapp-footer-text">
                 <div class="col-xs-12 text-right webapp-nopadding"><!-- <span class="webapp-footer-link"
-                                                                         style="cursor:pointer;font-size:22px;"><strong>Logout </strong></span>| -->
-                    CSLB compare <br/>
-                    <span>&copy;2015 <span class="webapp-color-red"><strong> CSL Behring </strong></span> | <span
-                            class="webapp-last-update-date"></span></span></div>
-            </div>
-        </div>
-    </div>
-</div>
+                   style="cursor:pointer;font-size:22px;"><strong>Logout </strong></span>| -->
+                   CSLB compare <br/>
+                   <span>&copy;2015 <span class="webapp-color-red"><strong> CSL Behring </strong></span> | <span
+                   class="webapp-last-update-date"></span></span></div>
+               </div>
+           </div>
+       </div>
+   </div>
 </div>
 <script type="text/javascript" src="BinaryFileWriter.js"></script>
 <script type="text/javascript" src="cordova.js"></script>
@@ -577,11 +579,11 @@
                 if (i == 0) {
 
 //                    $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq((subindex - 1)).append('<div id="webapp-hover-element" style="position:block; background-color: #5d9f9d; margin-left:-38px; top:-3px; z-index:0; display:block; padding-left:10px; padding-right:10px; padding-top:' + currenthight + 'px; padding-bottom:' + currenthight + 'px;"><img src="img/hover-arrow.png" style="width:15px; height:30px;"/></div>');
-                    $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq((subindex - 1)).append('<div id="webapp-hover-element" style="position:absolute; background-color: #5d9f9d; margin-left:-38px; z-index:10000000000000000; top:-3px; display:block; padding-left:10px; padding-right:10px; padding-top:' + currenthight + 'px; padding-bottom:' + currenthight + 'px;"><img src="img/hover-arrow.png" style="width:15px; height:30px;"/></div>');
+$j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq((subindex - 1)).append('<div id="webapp-hover-element" style="position:absolute; background-color: #5d9f9d; margin-left:-38px; z-index:10000000000000000; top:-3px; display:block; padding-left:10px; padding-right:10px; padding-top:' + currenthight + 'px; padding-bottom:' + currenthight + 'px;"><img src="img/hover-arrow.png" style="width:15px; height:30px;"/></div>');
 
-                }
+}
 
-            });
+});
 
             $j('.webapp-cproduct-value .webapp-nested-attri-block').on('mouseleave', function () {
                 var subindex = $j(this).index();
