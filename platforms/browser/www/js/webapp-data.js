@@ -1868,6 +1868,7 @@ function convertMathCharacters(str){
                 theme: 'grid',
                 tableWidth: 'auto',
                 pageBreak: 'auto',
+                fontSize:9,
                 styles: {
                     overflow: 'linebreak',
                     halign: 'left',
