@@ -6,86 +6,26 @@
  Licensed under the MIT License:
  http://www.opensource.org/licenses/mit-license.php
  */
- var base_url = 'https://www.telberia.com/projects/product.compare-de';
- var url = base_url + "/admin/API_Telberia";
- //var url = "http://localhost/compare/server.php";
-//  var obj = {  
-//   method: 'POST',
-//   headers: {
-//     'Accept': 'application/json',
-//     'Content-Type': 'application/json',
-//     'Origin': '',
-//     'Host': 'api.producthunt.com'
-// },
-// body: JSON.stringify({
-//     'client_id': '(API KEY)',
-//     'client_secret': '(API SECRET)',
-//     'grant_type': 'client_credentials'
-// })
-// }
-
-// fetch(url, obj)  
-// .then(function(res) {
-
-//     return res.json();
-// })
-// .then(function(resJson) {
-//     console.log(resJson)
-//     return resJson;
-// })
-
-
-// using Fetch API
-// var myHeaders = new Headers();
-// myHeaders.append("Authorization", 'Basic ' + btoa('myuser:mypswd'));
-// fetch(url, {
-//     headers: myHeaders
-// }).then(function (response) {
-//     return response.json();
-// }).then(function (json) {
-//     console.log(json);
-// });
-
-
-
-
 function convertMathCharacters(str){
-   var les = '<=';
-   var ge = '>=';
-   var plus = "+-";
+     var les = '<=';
+     var ge = '>=';
+     var plus = "+-";
 
-   var find = '≤';
-   var re = new RegExp(find, 'g');
-   str = str.replace(re, les);
+     var find = '≤';
+     var re = new RegExp(find, 'g');
+     str = str.replace(re, les);
 
-   find = '≥';
-   re = new RegExp(find, 'g');
-   str = str.replace(re, ge);
+     find = '≥';
+     re = new RegExp(find, 'g');
+     str = str.replace(re, ge);
 
-   find = '±';
-   re = new RegExp(find, 'g');
-   str = str.replace(re, plus);
+     find = '±';
+     re = new RegExp(find, 'g');
+     str = str.replace(re, plus);
 
-   return str;
-}
-$j(function () {
-
-    $j.ajax
-    ({
-      type: "GET",
-      url: url,
-      dataType: 'json',
-      headers: {
-        "Authorization": "Basic " + btoa('123' + ":" + '321')
-    },
-    data: '{ "comment" }',
-    success: function (e){
-        console.log(e)
-        alert('Thanks for your comment!'); 
-    }
-});
-
-
+     return str;
+ }
+ $j(function () {
 
     var dcoachDB = {
 
@@ -1170,7 +1110,7 @@ $j(function () {
 
             var that = this;
 
-            var url = base_url +  "/assets/json/product.json";
+            var url = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json";
             var productdata = [];
 
             $j.getJSON(url, function (data) {
@@ -1918,7 +1858,7 @@ $j(function () {
 
                rowsarray.push($j.merge($j.merge([], parray), carray));
 
-           });
+            });
 
             var columns = columnsarray;
             var rows = rowsarray;
