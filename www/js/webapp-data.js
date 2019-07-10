@@ -6,6 +6,10 @@
  Licensed under the MIT License:
  http://www.opensource.org/licenses/mit-license.php
  */
+var base_url = 'http://product.compare.2281008-0401.anx-cus.net';
+var url = base_url + "/admin/API_Telberia";
+
+
 function convertMathCharacters(str){
      var les = '<=';
      var ge = '>=';
@@ -25,10 +29,182 @@ function convertMathCharacters(str){
 
      return str;
  }
+ 
  $j(function () {
 
     var dcoachDB = {
 
+        syncData: function() {
+            that = this;
+            $j.ajax({
+                type: "GET",
+                url: url,
+                dataType: 'json',
+                headers: {
+                    "Authorization": "Basic " + btoa('123' + ":" + '321')
+                },
+                success: function(data) {
+                    //console.log(data)
+                    data_product = data['product'];
+                    data_product_attribute = data['product_attribute'];
+                    data_product_company = data['product_company'];
+                    data_company_attribute = data['company_attribute'];
+                    dcoachDB.sync_product(data_product)
+                    dcoachDB.sync_product_attribute(data_product_attribute)
+                    dcoachDB.sync_product_company(data_product_company)
+                    dcoachDB.sync_company_attribute(data_company_attribute)
+
+                    /* INSERT UPDATE DATE */
+
+
+                    var currentdate = new Date();
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("DELETE FROM webapp_update", []);
+                            transaction.executeSql("INSERT INTO webapp_update(date) VALUES (?)", [currentdate]);
+                            $j('.webapp-product-sync-row').css('visibility', 'hidden');
+                            $j('.webapp-product-sync-row').css('position', 'absolute');
+                            $j("#webapp-product-data").listview('refresh');
+                            $j("#tabs").tabs("option", "active", 0);
+                        }
+                        );
+
+
+                    /* UPDATE FOOTER DATE */
+
+
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("SELECT * FROM webapp_update;", [], function(transaction, results) {
+
+                                if (results.rows.length != 0) {
+
+                                    for (var r = 0; r < results.rows.length; r++) {
+                                        var updatedate = new Date(results.rows.item(r).date);
+                                    }
+                                    var dataUpdateDate = updatedate.toLocaleString("de");
+
+                                    $j('.webapp-last-update-date').html(dataUpdateDate);
+
+                                }
+                            });
+                        }
+                        );
+                    /* UPDATE END */
+                }
+            });
+        },
+
+        sync_product: function(data) {
+            //console.log(data)
+            var productdata = [];
+            if (data.length > 0) {
+                var remoteImages = [];
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product", []);
+                    }
+                    );
+
+                for (var d = 0; d < data.length; d++) {
+                    //console.log(data[d]['product_img']);
+                    remoteImages.push(data[d]['product_img']);
+                    productdata[d] = [data[d]['id'], data[d]['product_name'], data[d]['product_description'], data[d]['product_img'], data[d]['product_reg_date']];
+
+                }
+
+                that.downloadImages(remoteImages, 1);
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product(id, product_name, product_description, product_img, product_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata[e][0], productdata[e][1], productdata[e][2], productdata[e][3], productdata[e][4]]);
+
+                        }
+                    }
+                    );
+            }
+        },
+        sync_product_company: function(data) {
+
+
+            var productdata1 = [];
+            if (data.length > 0) {
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product_company", []);
+                    }
+                    );
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata1[d] = [data[d]['id'], data[d]['product_id'], data[d]['company_name'], data[d]['product_name'], data[d]['company_reg_date']];
+                }
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata1.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product_company(id, product_id, company_name, product_name, company_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata1[e][0], productdata1[e][1], productdata1[e][2], productdata1[e][3], productdata1[e][4]]);
+
+                        }
+                    }
+                    );
+            }
+             console.log(productdata1)
+        },
+        sync_product_attribute: function(data) {
+            console.log(data)
+            var productdata2 = [];
+            if (data.length > 0) {
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product_attribute", []);
+                    }
+                    );
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata2[d] = [data[d]['id'], data[d]['product_id'], data[d]['attribute_name'], data[d]['attribute_id'], data[d]['value'], data[d]['ordering']];
+                }
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+
+                        for (var e = 0; e < productdata2.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product_attribute(id, product_id, attribute_name, attribute_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata2[e][0], productdata2[e][1], productdata2[e][2], productdata2[e][3], productdata2[e][4], productdata2[e][5]]);
+                        }
+
+                    }
+                    );
+            }
+        },
+        sync_company_attribute: function(data) {
+            console.log(data)
+            var productdata3 = [];
+            if (data.length > 0) {
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_company_attribute", []);
+                    }
+                    );
+
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata3[d] = [data[d]['id'], data[d]['attribute_id'], data[d]['product_id'], data[d]['company_id'], data[d]['value'], data[d]['ordering']];
+                }
+
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata3.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_company_attribute(id, attribute_id, product_id, company_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata3[e][0], productdata3[e][1], productdata3[e][2], productdata3[e][3], productdata3[e][4], productdata3[e][5]]);
+                        }
+                    }
+                    );
+
+            }
+        },
         /* OFFLINE INIT */
 
         offlineInit: function () {
@@ -1107,187 +1283,187 @@ function convertMathCharacters(str){
             /* INSERT PRODUCT */
 
             $j('#loading-img').css('display', 'block');
+             dcoachDB.syncData();
+            // var that = this;
 
-            var that = this;
+            // var url = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json";
+            // var productdata = [];
 
-            var url = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json";
-            var productdata = [];
+            // $j.getJSON(url, function (data) {
 
-            $j.getJSON(url, function (data) {
+            //     if (data.length > 0) {
+            //         var remoteImages = [];
 
-                if (data.length > 0) {
-                    var remoteImages = [];
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 transaction.executeSql("DELETE FROM webapp_product", []);
+            //             }
+            //             );
 
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            transaction.executeSql("DELETE FROM webapp_product", []);
-                        }
-                        );
+            //         for (var d = 0; d < data.length; d++) {
+            //             console.log(data[d]['product_img']);
+            //             remoteImages.push(data[d]['product_img']);
+            //             productdata[d] = [data[d]['id'], data[d]['product_name'], data[d]['product_description'], data[d]['product_img'], data[d]['product_reg_date']];
 
-                    for (var d = 0; d < data.length; d++) {
-                        console.log(data[d]['product_img']);
-                        remoteImages.push(data[d]['product_img']);
-                        productdata[d] = [data[d]['id'], data[d]['product_name'], data[d]['product_description'], data[d]['product_img'], data[d]['product_reg_date']];
+            //         }
 
-                    }
+            //         that.downloadImages(remoteImages, 1);
 
-                    that.downloadImages(remoteImages, 1);
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 for (var e = 0; e < productdata.length; e++) {
+            //                     transaction.executeSql("INSERT INTO webapp_product(id, product_name, product_description, product_img, product_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata[e][0], productdata[e][1], productdata[e][2], productdata[e][3], productdata[e][4]]);
 
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            for (var e = 0; e < productdata.length; e++) {
-                                transaction.executeSql("INSERT INTO webapp_product(id, product_name, product_description, product_img, product_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata[e][0], productdata[e][1], productdata[e][2], productdata[e][3], productdata[e][4]]);
+            //                 }
+            //             }
+            //             );
+            //     }
 
-                            }
-                        }
-                        );
-                }
-
-            });
-
-
-            /* INSERT PRODUCT COMPANY */
+            // });
 
 
-            var url1 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json";
-            var productdata1 = [];
+            // /* INSERT PRODUCT COMPANY */
 
 
-            $j.getJSON(url1, function (data) {
-
-                if (data.length > 0) {
-
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            transaction.executeSql("DELETE FROM webapp_product_company", []);
-                        }
-                        );
-
-                    for (var d = 0; d < data.length; d++) {
-                        productdata1[d] = [data[d]['id'], data[d]['product_id'], data[d]['company_name'], data[d]['product_name'], data[d]['company_reg_date']];
-                    }
-
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            for (var e = 0; e < productdata1.length; e++) {
-                                transaction.executeSql("INSERT INTO webapp_product_company(id, product_id, company_name, product_name, company_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata1[e][0], productdata1[e][1], productdata1[e][2], productdata1[e][3], productdata1[e][4]]);
-
-                            }
-                        }
-                        );
-                }
-
-            });
+            // var url1 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json";
+            // var productdata1 = [];
 
 
-            /* INSERT PRODUCT ATTRIBUTE */
+            // $j.getJSON(url1, function (data) {
+
+            //     if (data.length > 0) {
+
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 transaction.executeSql("DELETE FROM webapp_product_company", []);
+            //             }
+            //             );
+
+            //         for (var d = 0; d < data.length; d++) {
+            //             productdata1[d] = [data[d]['id'], data[d]['product_id'], data[d]['company_name'], data[d]['product_name'], data[d]['company_reg_date']];
+            //         }
+
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 for (var e = 0; e < productdata1.length; e++) {
+            //                     transaction.executeSql("INSERT INTO webapp_product_company(id, product_id, company_name, product_name, company_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata1[e][0], productdata1[e][1], productdata1[e][2], productdata1[e][3], productdata1[e][4]]);
+
+            //                 }
+            //             }
+            //             );
+            //     }
+
+            // });
 
 
-            var url2 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json";
-            var productdata2 = [];
-
-            $j.getJSON(url2, function (data) {
-
-                if (data.length > 0) {
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            transaction.executeSql("DELETE FROM webapp_product_attribute", []);
-                        }
-                        );
-
-                    for (var d = 0; d < data.length; d++) {
-                        productdata2[d] = [data[d]['id'], data[d]['product_id'], data[d]['attribute_name'], data[d]['attribute_id'], data[d]['value'], data[d]['ordering']];
-                    }
-
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-
-                            for (var e = 0; e < productdata2.length; e++) {
-                                transaction.executeSql("INSERT INTO webapp_product_attribute(id, product_id, attribute_name, attribute_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata2[e][0], productdata2[e][1], productdata2[e][2], productdata2[e][3], productdata2[e][4], productdata2[e][5]]);
-                            }
-
-                        }
-                        );
-                }
-            });
+            // /* INSERT PRODUCT ATTRIBUTE */
 
 
-            /* INSERT COMPANY ATTRIBUTE */
+            // var url2 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json";
+            // var productdata2 = [];
+
+            // $j.getJSON(url2, function (data) {
+
+            //     if (data.length > 0) {
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 transaction.executeSql("DELETE FROM webapp_product_attribute", []);
+            //             }
+            //             );
+
+            //         for (var d = 0; d < data.length; d++) {
+            //             productdata2[d] = [data[d]['id'], data[d]['product_id'], data[d]['attribute_name'], data[d]['attribute_id'], data[d]['value'], data[d]['ordering']];
+            //         }
+
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+
+            //                 for (var e = 0; e < productdata2.length; e++) {
+            //                     transaction.executeSql("INSERT INTO webapp_product_attribute(id, product_id, attribute_name, attribute_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata2[e][0], productdata2[e][1], productdata2[e][2], productdata2[e][3], productdata2[e][4], productdata2[e][5]]);
+            //                 }
+
+            //             }
+            //             );
+            //     }
+            // });
 
 
-            var url3 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json";
-            var productselecteddata = [];
-            var productdata3 = [];
+            // /* INSERT COMPANY ATTRIBUTE */
 
 
-            $j.getJSON(url3, function (data) {
-
-                if (data.length > 0) {
-
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            transaction.executeSql("DELETE FROM webapp_company_attribute", []);
-                        }
-                        );
+            // var url3 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json";
+            // var productselecteddata = [];
+            // var productdata3 = [];
 
 
-                    for (var d = 0; d < data.length; d++) {
-                        productdata3[d] = [data[d]['id'], data[d]['attribute_id'], data[d]['product_id'], data[d]['company_id'], data[d]['value'], data[d]['ordering']];
-                    }
+            // $j.getJSON(url3, function (data) {
+
+            //     if (data.length > 0) {
+
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 transaction.executeSql("DELETE FROM webapp_company_attribute", []);
+            //             }
+            //             );
 
 
-                    WEBAPPDB.transaction(
-                        function (transaction) {
-                            for (var e = 0; e < productdata3.length; e++) {
-                                transaction.executeSql("INSERT INTO webapp_company_attribute(id, attribute_id, product_id, company_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata3[e][0], productdata3[e][1], productdata3[e][2], productdata3[e][3], productdata3[e][4], productdata3[e][5]]);
-                            }
-                        }
-                        );
-
-                }
-
-            });
+            //         for (var d = 0; d < data.length; d++) {
+            //             productdata3[d] = [data[d]['id'], data[d]['attribute_id'], data[d]['product_id'], data[d]['company_id'], data[d]['value'], data[d]['ordering']];
+            //         }
 
 
-            /* INSERT UPDATE DATE */
+            //         WEBAPPDB.transaction(
+            //             function (transaction) {
+            //                 for (var e = 0; e < productdata3.length; e++) {
+            //                     transaction.executeSql("INSERT INTO webapp_company_attribute(id, attribute_id, product_id, company_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata3[e][0], productdata3[e][1], productdata3[e][2], productdata3[e][3], productdata3[e][4], productdata3[e][5]]);
+            //                 }
+            //             }
+            //             );
+
+            //     }
+
+            // });
 
 
-            var currentdate = new Date();
-            WEBAPPDB.transaction(
-                function (transaction) {
-                    transaction.executeSql("DELETE FROM webapp_update", []);
-                    transaction.executeSql("INSERT INTO webapp_update(date) VALUES (?)", [currentdate]);
-                    $j('.webapp-product-sync-row').css('visibility', 'hidden');
-                    $j('.webapp-product-sync-row').css('position', 'absolute');
-                    $j("#webapp-product-data").listview('refresh');
-                    $j("#tabs").tabs("option", "active", 0);
-                }
-                );
+            // /* INSERT UPDATE DATE */
 
 
-            /* UPDATE FOOTER DATE */
+            // var currentdate = new Date();
+            // WEBAPPDB.transaction(
+            //     function (transaction) {
+            //         transaction.executeSql("DELETE FROM webapp_update", []);
+            //         transaction.executeSql("INSERT INTO webapp_update(date) VALUES (?)", [currentdate]);
+            //         $j('.webapp-product-sync-row').css('visibility', 'hidden');
+            //         $j('.webapp-product-sync-row').css('position', 'absolute');
+            //         $j("#webapp-product-data").listview('refresh');
+            //         $j("#tabs").tabs("option", "active", 0);
+            //     }
+            //     );
 
 
-            WEBAPPDB.transaction(
-                function (transaction) {
-                    transaction.executeSql("SELECT * FROM webapp_update;", [], function (transaction, results) {
-
-                        if (results.rows.length != 0) {
-
-                            for (var r = 0; r < results.rows.length; r++) {
-                                var updatedate = new Date(results.rows.item(r).date);
-                            }
-                            var dataUpdateDate = updatedate.toLocaleString("de");
-
-                            $j('.webapp-last-update-date').html(dataUpdateDate);
-
-                        }
-                    });
-                }
-                );
+            // /* UPDATE FOOTER DATE */
 
 
-            /* UPDATE END */
+            // WEBAPPDB.transaction(
+            //     function (transaction) {
+            //         transaction.executeSql("SELECT * FROM webapp_update;", [], function (transaction, results) {
+
+            //             if (results.rows.length != 0) {
+
+            //                 for (var r = 0; r < results.rows.length; r++) {
+            //                     var updatedate = new Date(results.rows.item(r).date);
+            //                 }
+            //                 var dataUpdateDate = updatedate.toLocaleString("de");
+
+            //                 $j('.webapp-last-update-date').html(dataUpdateDate);
+
+            //             }
+            //         });
+            //     }
+            //     );
+
+
+            // /* UPDATE END */
 
         },
 
