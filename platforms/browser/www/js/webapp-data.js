@@ -6,32 +6,208 @@
  Licensed under the MIT License:
  http://www.opensource.org/licenses/mit-license.php
  */
-function convertMathCharacters(str){
-     var les = '<=';
-     var ge = '>=';
-     var plus = "+-";
+var base_url = 'http://product.compare.2281008-0401.anx-cus.net';
+var url = base_url + "/admin/API_Telberia";
 
-     var find = '≤';
-     var re = new RegExp(find, 'g');
-     str = str.replace(re, les);
 
-     find = '≥';
-     re = new RegExp(find, 'g');
-     str = str.replace(re, ge);
+function convertMathCharacters(str) {
+    var les = '<=';
+    var ge = '>=';
+    var plus = "+-";
 
-     find = '±';
-     re = new RegExp(find, 'g');
-     str = str.replace(re, plus);
+    var find = '≤';
+    var re = new RegExp(find, 'g');
+    str = str.replace(re, les);
 
-     return str;
- }
- $j(function () {
+    find = '≥';
+    re = new RegExp(find, 'g');
+    str = str.replace(re, ge);
+
+    find = '±';
+    re = new RegExp(find, 'g');
+    str = str.replace(re, plus);
+
+    return str;
+}
+
+$j(function() {
 
     var dcoachDB = {
 
+        syncData: function() {
+            that = this;
+            $j.ajax({
+                type: "GET",
+                url: url,
+                dataType: 'json',
+                headers: {
+                    "Authorization": "Basic " + btoa('123' + ":" + '321')
+                },
+                success: function(data) {
+                    //console.log(data)
+                    data_product = data['product'];
+                    data_product_attribute = data['product_attribute'];
+                    data_product_company = data['product_company'];
+                    data_company_attribute = data['company_attribute'];
+                    dcoachDB.sync_product(data_product)
+                    dcoachDB.sync_product_attribute(data_product_attribute)
+                    dcoachDB.sync_product_company(data_product_company)
+                    dcoachDB.sync_company_attribute(data_company_attribute)
+
+                    /* INSERT UPDATE DATE */
+
+
+                    var currentdate = new Date();
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("DELETE FROM webapp_update", []);
+                            transaction.executeSql("INSERT INTO webapp_update(date) VALUES (?)", [currentdate]);
+                            $j('.webapp-product-sync-row').css('visibility', 'hidden');
+                            $j('.webapp-product-sync-row').css('position', 'absolute');
+                            $j("#webapp-product-data").listview('refresh');
+                            $j("#tabs").tabs("option", "active", 0);
+                        }
+                    );
+
+
+                    /* UPDATE FOOTER DATE */
+
+
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("SELECT * FROM webapp_update;", [], function(transaction, results) {
+
+                                if (results.rows.length != 0) {
+
+                                    for (var r = 0; r < results.rows.length; r++) {
+                                        var updatedate = new Date(results.rows.item(r).date);
+                                    }
+                                    var dataUpdateDate = updatedate.toLocaleString("de");
+
+                                    $j('.webapp-last-update-date').html(dataUpdateDate);
+
+                                }
+                            });
+                        }
+                    );
+                    /* UPDATE END */
+                }
+            });
+        },
+
+        sync_product: function(data) {
+            //console.log(data)
+            var productdata = [];
+            if (data.length > 0) {
+                var remoteImages = [];
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product", []);
+                    }
+                );
+
+                for (var d = 0; d < data.length; d++) {
+                    //console.log(data[d]['product_img']);
+                    remoteImages.push(data[d]['product_img']);
+                    productdata[d] = [data[d]['id'], data[d]['product_name'], data[d]['product_description'], data[d]['product_img'], data[d]['product_reg_date']];
+
+                }
+
+                that.downloadImages(remoteImages, 1);
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product(id, product_name, product_description, product_img, product_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata[e][0], productdata[e][1], productdata[e][2], productdata[e][3], productdata[e][4]]);
+
+                        }
+                    }
+                );
+            }
+        },
+        sync_product_company: function(data) {
+
+
+            var productdata1 = [];
+            if (data.length > 0) {
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product_company", []);
+                    }
+                );
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata1[d] = [data[d]['id'], data[d]['product_id'], data[d]['company_name'], data[d]['product_name'], data[d]['company_reg_date']];
+                }
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata1.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product_company(id, product_id, company_name, product_name, company_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata1[e][0], productdata1[e][1], productdata1[e][2], productdata1[e][3], productdata1[e][4]]);
+
+                        }
+                    }
+                );
+            }
+            console.log(productdata1)
+        },
+        sync_product_attribute: function(data) {
+            console.log(data)
+            var productdata2 = [];
+            if (data.length > 0) {
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_product_attribute", []);
+                    }
+                );
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata2[d] = [data[d]['id'], data[d]['product_id'], data[d]['attribute_name'], data[d]['attribute_id'], data[d]['value'], data[d]['ordering']];
+                }
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+
+                        for (var e = 0; e < productdata2.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_product_attribute(id, product_id, attribute_name, attribute_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata2[e][0], productdata2[e][1], productdata2[e][2], productdata2[e][3], productdata2[e][4], productdata2[e][5]]);
+                        }
+
+                    }
+                );
+            }
+        },
+        sync_company_attribute: function(data) {
+            console.log(data)
+            var productdata3 = [];
+            if (data.length > 0) {
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        transaction.executeSql("DELETE FROM webapp_company_attribute", []);
+                    }
+                );
+
+
+                for (var d = 0; d < data.length; d++) {
+                    productdata3[d] = [data[d]['id'], data[d]['attribute_id'], data[d]['product_id'], data[d]['company_id'], data[d]['value'], data[d]['ordering']];
+                }
+
+
+                WEBAPPDB.transaction(
+                    function(transaction) {
+                        for (var e = 0; e < productdata3.length; e++) {
+                            transaction.executeSql("INSERT INTO webapp_company_attribute(id, attribute_id, product_id, company_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata3[e][0], productdata3[e][1], productdata3[e][2], productdata3[e][3], productdata3[e][4], productdata3[e][5]]);
+                        }
+                    }
+                );
+
+            }
+        },
         /* OFFLINE INIT */
 
-        offlineInit: function () {
+        offlineInit: function() {
 
 
             alert('Internet ist nicht verfügbar');
@@ -40,16 +216,16 @@ function convertMathCharacters(str){
 
             var logindata = JSON.parse(localStorage.getItem('user'));
 
-            if (logindata == null) {
+            // if (logindata == null) {
 
-                window.location.replace('login.html');
+            //     window.location.replace('login.html');
 
-            } else {
+            // } else {
 
-                dcoachDB.initOfflineDatabase();
+            //     dcoachDB.initOfflineDatabase();
 
-            }
-
+            // }
+            dcoachDB.initOfflineDatabase();
 
             $j("#sortable").sortable({
                 revert: true
@@ -59,19 +235,19 @@ function convertMathCharacters(str){
             $j('#webapp-product-sync-row').css('visibility', 'hidden');
             $j('#webapp-product-sync-row').css('position', 'absolute');
 
-            $j('#firsttab').on('click', function () {
+            $j('#firsttab').on('click', function() {
                 $j("#webapp-product-data").listview('refresh');
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
             });
 
-            $j('#secondtab').on('click', function () {
+            $j('#secondtab').on('click', function() {
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
 
             });
 
-            $j('#thirdtab').on('click', function () {
+            $j('#thirdtab').on('click', function() {
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
 
@@ -80,7 +256,7 @@ function convertMathCharacters(str){
 
             /* SELECT OPTION */
 
-            $j('#select-choice-1').on('change', function () {
+            $j('#select-choice-1').on('change', function() {
 
                 if ($j("#select-choice-1 option:selected").val() == '1') {
 
@@ -116,7 +292,7 @@ function convertMathCharacters(str){
 
             /* GENERATE PDF EVENT */
 
-            $j('.pdf-pot').on('click', function () {
+            $j('.pdf-pot').on('click', function() {
 
                 document.addEventListener("online", dcoachDB.generateLandPDF(), false);
                 document.addEventListener("offline", dcoachDB.generateLandPDF(), false);
@@ -124,7 +300,7 @@ function convertMathCharacters(str){
             });
 
 
-            $j('.pdf-land').on('click', function () {
+            $j('.pdf-land').on('click', function() {
 
                 document.addEventListener("online", dcoachDB.generatePDF(), false);
                 document.addEventListener("offline", dcoachDB.generatePDF(), false);
@@ -134,28 +310,28 @@ function convertMathCharacters(str){
 
             /* LOGOUT */
 
-            $j('.webapp-footer-link').on('click', function () {
-                localStorage.setItem('user', '');
-                window.location.replace('login.html');
+            $j('.webapp-footer-link').on('click', function() {
+                // localStorage.setItem('user', '');
+                // window.location.replace('login.html');
             });
 
 
             /* TO TOP BUTTON */
 
 
-            $j('#backToTopBtn').on('click', function () {
-                $j('#top').animate({scrollTop: $j('#top').offset().top}, "slow");
+            $j('#backToTopBtn').on('click', function() {
+                $j('#top').animate({ scrollTop: $j('#top').offset().top }, "slow");
             });
 
 
-            
+
 
             /* COLUMN SORTABLE */
 
 
             $j("#sortable").sortable({
-                sort: function () {
-                    $j('.webapp-cproduct-value').each(function () {
+                sort: function() {
+                    $j('.webapp-cproduct-value').each(function() {
 
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
@@ -165,8 +341,8 @@ function convertMathCharacters(str){
 
 
                 },
-                stop: function () {
-                    $j('.webapp-cproduct-value').each(function () {
+                stop: function() {
+                    $j('.webapp-cproduct-value').each(function() {
 
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
@@ -176,9 +352,9 @@ function convertMathCharacters(str){
 
 
                 },
-                update: function () {
+                update: function() {
 
-                    $j('.webapp-cproduct-value').each(function () {
+                    $j('.webapp-cproduct-value').each(function() {
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
                             left: left
@@ -188,8 +364,8 @@ function convertMathCharacters(str){
                 }
             });
 
-            $j('.ui-input-clear').on('click', function () {
-                $j('.highlight').each(function () {
+            $j('.ui-input-clear').on('click', function() {
+                $j('.highlight').each(function() {
                     $j('span').removeClass("highlight");
                 });
             });
@@ -200,7 +376,7 @@ function convertMathCharacters(str){
             /* PRODUCT COMPANY */
 
 
-            $j('#webapp-product-data').on('click', '.ui-list-view', function () {
+            $j('#webapp-product-data').on('click', '.ui-list-view', function() {
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
@@ -222,23 +398,23 @@ function convertMathCharacters(str){
                 }
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_company WHERE product_id = '" + pid + "';", [], dcoachDB.productCompany, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_company_attribute;", [], dcoachDB.addCompanyAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
             });
 
 
             /* PRODUCT ATTRIBUTE */
 
-            $j('.webapp-product-attr-but').on('click', function () {
+            $j('.webapp-product-attr-but').on('click', function() {
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
@@ -249,7 +425,7 @@ function convertMathCharacters(str){
                 var v = 0;
 
 
-                $j('#webapp-product-com-list :checked').each(function () {
+                $j('#webapp-product-com-list :checked').each(function() {
                     companycheckvalue.push($j(this).val());
                     companycheckname[v] = $j(this).attr('data-company-name');
                     companycheckpname[v] = $j(this).attr('data-cproduct-name');
@@ -263,23 +439,23 @@ function convertMathCharacters(str){
                 var pid = JSON.parse(localStorage.getItem('product-id'));
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_attribute WHERE product_id = '" + pid + "';", [], dcoachDB.productAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
             });
 
 
             /* PRODUCT COMPARE */
 
-            $j('.webapp-product-compare-but').on('click', function () {
+            $j('.webapp-product-compare-but').on('click', function() {
 
                 var attributecheckvalue = [];
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
-                $j('#webapp-product-attr-ul :checked').each(function () {
+                $j('#webapp-product-attr-ul :checked').each(function() {
                     attributecheckvalue.push($j(this).val());
                 });
 
@@ -292,33 +468,33 @@ function convertMathCharacters(str){
 
                 /* Get Selected Product Arttribute data */
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_attribute WHERE product_id = '" + pid + "' AND id IN (" + aid + ") ORDER BY ordering ASC;", [], dcoachDB.productSelectAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
                 /* Get Selected Company Arttribute data */
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_company_attribute WHERE product_id='" + pid + "' AND attribute_id IN (" + aid + ") AND company_id IN (" + cid + ") ORDER BY ordering ASC;", [], dcoachDB.companySelectAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
 
             });
 
             /* CHECK/UNCHECK CHECKBOX */
 
-            $j('.webapp-button-check').on('click', function () {
+            $j('.webapp-button-check').on('click', function() {
                 var checkvalue = $j(this).attr('data-check');
-                $j('#' + checkvalue + ' li input[type=checkbox]').each(function () {
+                $j('#' + checkvalue + ' li input[type=checkbox]').each(function() {
                     $j(this).prop('checked', true).checkboxradio('refresh');
                 });
             });
 
-            $j('.webapp-button-uncheck').on('click', function () {
+            $j('.webapp-button-uncheck').on('click', function() {
                 var checkvalue = $j(this).attr('data-check');
-                $j('#' + checkvalue + ' li input[type=checkbox]').each(function () {
+                $j('#' + checkvalue + ' li input[type=checkbox]').each(function() {
                     $j(this).prop('checked', false).checkboxradio('refresh');
                 });
             });
@@ -326,15 +502,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-compare-list').on('keyup', function () {
+            $j('#webapp-product-compare-list').on('keyup', function() {
 
                 var regex;
                 $j('#four label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-attr-list').addClass('error')
                 }
 
@@ -350,15 +524,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-list').on('keyup', function () {
+            $j('#webapp-product-list').on('keyup', function() {
 
                 var regex;
                 $j('#one h2').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-data').addClass('error')
                 }
 
@@ -374,15 +546,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-company-list').on('keyup', function () {
+            $j('#webapp-product-company-list').on('keyup', function() {
 
                 var regex;
                 $j('#two label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-attr-ul').addClass('error')
                 }
 
@@ -398,15 +568,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-attr-list').on('keyup', function () {
+            $j('#webapp-product-attr-list').on('keyup', function() {
 
                 var regex;
                 $j('#three label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-com-list').addClass('error')
                 }
 
@@ -423,21 +591,21 @@ function convertMathCharacters(str){
 
         /* ONLINE INIT */
 
-        init: function () {
+        init: function() {
 
             $j("#webapp-product-data").listview('refresh');
 
             var logindata = JSON.parse(localStorage.getItem('user'));
 
-            if (logindata == null) {
+            // if (logindata == null) {
 
-                window.location.replace('login.html');
+            //     window.location.replace('login.html');
 
-            } else {
+            // } else {
 
-                dcoachDB.initDatabase();
-            }
-
+            //     dcoachDB.initDatabase();
+            // }
+            dcoachDB.initDatabase();
 
             $j("#sortable").sortable({
                 revert: true
@@ -446,19 +614,19 @@ function convertMathCharacters(str){
             $j('#webapp-product-sync-row').css('visibility', 'hidden');
             $j('#webapp-product-sync-row').css('position', 'absolute');
 
-            $j('#firsttab').on('click', function () {
+            $j('#firsttab').on('click', function() {
                 $j("#webapp-product-data").listview('refresh');
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
             });
 
-            $j('#secondtab').on('click', function () {
+            $j('#secondtab').on('click', function() {
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
 
             });
 
-            $j('#thirdtab').on('click', function () {
+            $j('#thirdtab').on('click', function() {
                 $j('#fourtab').removeClass('ui-tabs-active ui-state-active');
                 $j("#sortable").sortable("refreshPositions");
 
@@ -467,7 +635,7 @@ function convertMathCharacters(str){
 
             /* SELECT OPTION */
 
-            $j('#select-choice-1').on('change', function () {
+            $j('#select-choice-1').on('change', function() {
 
                 if ($j("#select-choice-1 option:selected").val() == '1') {
 
@@ -503,7 +671,7 @@ function convertMathCharacters(str){
             });
 
 
-            $j('.topbutton').on('click', function () {
+            $j('.topbutton').on('click', function() {
 
                 dcoachDB.importData();
 
@@ -514,7 +682,7 @@ function convertMathCharacters(str){
             });
             /* GENERATE PDF EVENT */
 
-            $j('.pdf-pot').on('click', function () {
+            $j('.pdf-pot').on('click', function() {
 
                 document.addEventListener("online", dcoachDB.generateLandPDF(), false);
                 //document.addEventListener("offline", dcoachDB.generateLandPDF(), false);
@@ -522,7 +690,7 @@ function convertMathCharacters(str){
             });
 
 
-            $j('.pdf-land').on('click', function () {
+            $j('.pdf-land').on('click', function() {
 
                 document.addEventListener("online", dcoachDB.generatePDF(), false);
                 //document.addEventListener("offline", dcoachDB.generatePDF(), false);
@@ -532,41 +700,41 @@ function convertMathCharacters(str){
 
             /* LOGOUT */
 
-            $j('.webapp-footer-link').on('click', function () {
-                localStorage.setItem('user', '');
-                window.location.replace('login.html');
+            $j('.webapp-footer-link').on('click', function() {
+                // localStorage.setItem('user', '');
+                // window.location.replace('login.html');
             });
 
 
             /* TO TOP BUTTON */
 
 
-            $j('#backToTopBtn').on('click', function () {
-                $j('#top').animate({scrollTop: $j('#top').offset().top}, "slow");
+            $j('#backToTopBtn').on('click', function() {
+                $j('#top').animate({ scrollTop: $j('#top').offset().top }, "slow");
             });
 
 
-            $j('#top').on('scroll', function (event) {
-                    // alert("scrolllinggg body");
+            $j('#top').on('scroll', function(event) {
+                // alert("scrolllinggg body");
 
 
-                    if ($j('.container-fluid').offset().top < '-390') {
+                if ($j('.container-fluid').offset().top < '-390') {
 
-                        $j('.webapp-cproduct-names').css('position', 'fixed').css('top', '0px').css('z-index', '2');
-                        $j('.webapp-dproduct-name-0').css('position', 'fixed').css('top', '0px').css('z-index', '2');
-                        $j('.webapp-dproduct-name').css('position', 'fixed').css('top', '0px').css('z-index', '2').css('background-color', '#fff').css('width', '100%');
+                    $j('.webapp-cproduct-names').css('position', 'fixed').css('top', '0px').css('z-index', '2');
+                    $j('.webapp-dproduct-name-0').css('position', 'fixed').css('top', '0px').css('z-index', '2');
+                    $j('.webapp-dproduct-name').css('position', 'fixed').css('top', '0px').css('z-index', '2').css('background-color', '#fff').css('width', '100%');
 
 
 
                     // $j('.webapp-cproduct-names').css('position', 'fixed').css('top','0px').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name-0').css('position', 'fixed').css('top','0px').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name').css('position', 'fixed').css('top','0px').css('z-index', '2').css('width', '162px').css('background-color', '#fff');
-                    
+
                     // $j('.webapp-cproduct-names').css('position', 'absolute').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name-0').css('position', 'absolute').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name').css('position', 'absolute').css('z-index', '2').css('width', '162px').css('background-color', '#fff');
                     var topY = (Math.abs($j('.box').offset().top) - Math.abs($j('.box').offset().top));
-                    $j('.webapp-cproduct-value').each(function () {
+                    $j('.webapp-cproduct-value').each(function() {
 
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
@@ -594,7 +762,7 @@ function convertMathCharacters(str){
                     $j('.webapp-dproduct-name-0').css('position', 'relative').css('top', '0').css('left', 'auto');
                     $j('.webapp-cproduct-names').css('position', 'relative').css('top', '0').css('left', 'auto');
 
-                    
+
                     // $j('.webapp-cproduct-names').css('position', 'relative').css('top', '0').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name-0').css('position', 'relative').css('top', '0').css('z-index', '2').css('width', '162px');
                     // $j('.webapp-dproduct-name').css('position', 'relative').css('top', '0').css('z-index', '2').css('width', '162px');
@@ -605,7 +773,7 @@ function convertMathCharacters(str){
                 }
 
 
-                $j('.webapp-cproduct-value').each(function () {
+                $j('.webapp-cproduct-value').each(function() {
                     var left = $j(this).offset().left;
                     $j(this).find(".webapp-cproduct-names").offset({
                         left: left
@@ -633,9 +801,9 @@ function convertMathCharacters(str){
 
 
             $j("#sortable").sortable({
-                sort: function () {
+                sort: function() {
 
-                    $j('.webapp-cproduct-value').each(function () {
+                    $j('.webapp-cproduct-value').each(function() {
 
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
@@ -644,8 +812,8 @@ function convertMathCharacters(str){
                     });
 
                 },
-                stop: function (event, ui) {
-                    $j('.webapp-cproduct-value').each(function () {
+                stop: function(event, ui) {
+                    $j('.webapp-cproduct-value').each(function() {
 
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
@@ -653,9 +821,9 @@ function convertMathCharacters(str){
                         });
                     });
                 },
-                update: function () {
+                update: function() {
 
-                    $j('.webapp-cproduct-value').each(function () {
+                    $j('.webapp-cproduct-value').each(function() {
                         var left = $j(this).offset().left;
                         $j(this).find(".webapp-cproduct-names").offset({
                             left: left
@@ -666,8 +834,8 @@ function convertMathCharacters(str){
                 }
             });
 
-            $j('.ui-input-clear').on('click', function () {
-                $j('.highlight').each(function () {
+            $j('.ui-input-clear').on('click', function() {
+                $j('.highlight').each(function() {
                     $j('span').removeClass("highlight");
                 });
             });
@@ -678,7 +846,7 @@ function convertMathCharacters(str){
             /* PRODUCT COMPANY */
 
 
-            $j('#webapp-product-data').on('click', '.ui-list-view', function () {
+            $j('#webapp-product-data').on('click', '.ui-list-view', function() {
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
@@ -697,23 +865,23 @@ function convertMathCharacters(str){
                 }
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_company WHERE product_id = '" + pid + "';", [], dcoachDB.productCompany, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_company_attribute;", [], dcoachDB.addCompanyAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
             });
 
 
             /* PRODUCT ATTRIBUTE */
 
-            $j('.webapp-product-attr-but').on('click', function () {
+            $j('.webapp-product-attr-but').on('click', function() {
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
@@ -723,7 +891,7 @@ function convertMathCharacters(str){
 
                 var v = 0;
 
-                $j('#webapp-product-com-list :checked').each(function () {
+                $j('#webapp-product-com-list :checked').each(function() {
                     companycheckvalue.push($j(this).val());
                     companycheckname[v] = $j(this).attr('data-company-name');
                     companycheckpname[v] = $j(this).attr('data-cproduct-name');
@@ -738,23 +906,23 @@ function convertMathCharacters(str){
                 var pid = JSON.parse(localStorage.getItem('product-id'));
 
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_attribute WHERE product_id = '" + pid + "';", [], dcoachDB.productAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
             });
 
 
             /* PRODUCT COMPARE */
 
-            $j('.webapp-product-compare-but').on('click', function () {
+            $j('.webapp-product-compare-but').on('click', function() {
 
                 var attributecheckvalue = [];
 
                 $j('.webapp-navbar-tab').find('ul li a.ui-tabs-anchor').removeClass('ui-btn-active');
 
-                $j('#webapp-product-attr-ul :checked').each(function () {
+                $j('#webapp-product-attr-ul :checked').each(function() {
                     attributecheckvalue.push($j(this).val());
                 });
 
@@ -767,33 +935,33 @@ function convertMathCharacters(str){
 
                 /* Get Selected Product Arttribute data */
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_product_attribute WHERE product_id = '" + pid + "' AND id IN (" + aid + ") ORDER BY ordering ASC;", [], dcoachDB.productSelectAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
                 /* Get Selected Company Arttribute data */
                 WEBAPPDB.transaction(
-                    function (transaction) {
+                    function(transaction) {
                         transaction.executeSql("SELECT * FROM webapp_company_attribute WHERE product_id='" + pid + "' AND attribute_id IN (" + aid + ") AND company_id IN (" + cid + ") ORDER BY ordering ASC;", [], dcoachDB.companySelectAttribute, dcoachDB.errorHandler);
                     }
-                    );
+                );
 
 
             });
 
             /* CHECK/UNCHECK CHECKBOX */
 
-            $j('.webapp-button-check').on('click', function () {
+            $j('.webapp-button-check').on('click', function() {
                 var checkvalue = $j(this).attr('data-check');
-                $j('#' + checkvalue + ' li input[type=checkbox]').each(function () {
+                $j('#' + checkvalue + ' li input[type=checkbox]').each(function() {
                     $j(this).prop('checked', true).checkboxradio('refresh');
                 });
             });
 
-            $j('.webapp-button-uncheck').on('click', function () {
+            $j('.webapp-button-uncheck').on('click', function() {
                 var checkvalue = $j(this).attr('data-check');
-                $j('#' + checkvalue + ' li input[type=checkbox]').each(function () {
+                $j('#' + checkvalue + ' li input[type=checkbox]').each(function() {
                     $j(this).prop('checked', false).checkboxradio('refresh');
                 });
             });
@@ -801,15 +969,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-compare-list').on('keyup', function () {
+            $j('#webapp-product-compare-list').on('keyup', function() {
 
                 var regex;
                 $j('#four label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-attr-list').addClass('error')
                 }
 
@@ -825,15 +991,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-list').on('keyup', function () {
+            $j('#webapp-product-list').on('keyup', function() {
 
                 var regex;
                 $j('#one h2').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-data').addClass('error')
                 }
 
@@ -849,15 +1013,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-company-list').on('keyup', function () {
+            $j('#webapp-product-company-list').on('keyup', function() {
 
                 var regex;
                 $j('#two label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-attr-ul').addClass('error')
                 }
 
@@ -873,15 +1035,13 @@ function convertMathCharacters(str){
             /* SEARCH HIGHLIGHTER */
 
 
-            $j('#webapp-product-attr-list').on('keyup', function () {
+            $j('#webapp-product-attr-list').on('keyup', function() {
 
                 var regex;
                 $j('#three label').highlightRegex();
                 try {
                     regex = new RegExp($j(this).val(), 'ig')
-                }
-
-                catch (e) {
+                } catch (e) {
                     $j('#webapp-product-com-list').addClass('error')
                 }
 
@@ -900,7 +1060,7 @@ function convertMathCharacters(str){
          **** IF OFFLINE THEN EXECUTE THIS FUNCTION **
          ***/
 
-         initOfflineDatabase: function () {
+        initOfflineDatabase: function() {
 
             try {
 
@@ -910,28 +1070,40 @@ function convertMathCharacters(str){
 
                 } else {
 
-                    var shortName = 'WEBAPPDB',
-                    version = '1.0',
-                    displayName = 'DCOACH DATABASE',
+                    var shortName = 'WEBAPPDBAT',
+                        version = '1.0',
+                        displayName = 'DCOACH DATABASE',
                         maxSize = 100000; // in bytes
 
-                        WEBAPPDB = window.openDatabase(shortName, version, displayName, maxSize);
+                    WEBAPPDB = window.openDatabase(shortName, version, displayName, maxSize);
+                    WEBAPPDB.transaction(
+                        function (transaction) {
+                            console.log(WEBAPPDB)
+                            //id INTEGER NOT NULL PRIMARY KEY
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_company_attribute(id NUMBER, attribute_id NUMBER, product_id NUMBER, company_id NUMBER, value TEXT, ordering NUMBER);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product(id NUMBER, product_name VARCHAR, product_description TEXT, product_img VARCHAR, product_reg_date DATE);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_attribute(id NUMBER, product_id NUMBER, attribute_name VARCHAR, attribute_id NUMBER, value TEXT, ordering NUMBER);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_company(id NUMBER, product_id NUMBER, company_name VARCHAR, product_name VARCHAR, company_reg_date DATE);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_user(id INTEGER NOT NULL PRIMARY KEY, username VARCHAR, password VARCHAR);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_file_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);');
+                        }
+                        );
+                    var that = this;
 
-                        var that = this;
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
+                        }
+                    );
 
-                        WEBAPPDB.transaction(
-                            function (transaction) {
-                                transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
-                            }
-                            );
+                    $j("#webapp-product-data").listview('refresh');
 
-                        $j("#webapp-product-data").listview('refresh');
+                }
 
-                    }
+            } catch (e) {
 
-                } catch (e) {
-
-                    if (e === 2) {
+                if (e === 2) {
                     // Version mismatch.
                     console.log("Invalid database version.");
                 } else {
@@ -946,7 +1118,7 @@ function convertMathCharacters(str){
          **** IF ONLINE THEN EXECUTE THIS FUNCTION **
          ***/
 
-         initDatabase: function () {
+        initDatabase: function() {
 
             try {
 
@@ -956,125 +1128,137 @@ function convertMathCharacters(str){
 
                 } else {
 
-                    var shortName = 'WEBAPPDB',
-                    version = '1.0',
-                    displayName = 'DCOACH DATABASE',
+                    var shortName = 'WEBAPPDBAT',
+                        version = '1.0',
+                        displayName = 'DCOACH DATABASE',
                         maxSize = 100000; // in bytes
 
-                        WEBAPPDB = window.openDatabase(shortName, version, displayName, maxSize);
+                    WEBAPPDB = window.openDatabase(shortName, version, displayName, maxSize);
+                    
+                    WEBAPPDB.transaction(
+                        function (transaction) {
+                            console.log(WEBAPPDB)
+                            //id INTEGER NOT NULL PRIMARY KEY
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_company_attribute(id NUMBER, attribute_id NUMBER, product_id NUMBER, company_id NUMBER, value TEXT, ordering NUMBER);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product(id NUMBER, product_name VARCHAR, product_description TEXT, product_img VARCHAR, product_reg_date DATE);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_attribute(id NUMBER, product_id NUMBER, attribute_name VARCHAR, attribute_id NUMBER, value TEXT, ordering NUMBER);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_company(id NUMBER, product_id NUMBER, company_name VARCHAR, product_name VARCHAR, company_reg_date DATE);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_user(id INTEGER NOT NULL PRIMARY KEY, username VARCHAR, password VARCHAR);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);');
+                            transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_file_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);');
+                        }
+                        );
+                    var that = this;
 
-                        var that = this;
+                    WEBAPPDB.transaction(
+                        function(transaction) {
+                            transaction.executeSql("SELECT * FROM webapp_update;", [], function(transaction, results) {
 
-                        WEBAPPDB.transaction(
-                            function (transaction) {
-                                transaction.executeSql("SELECT * FROM webapp_update;", [], function (transaction, results) {
+                                if (results.rows.length == 0) {
 
-                                    if (results.rows.length == 0) {
+                                    /* ON INIT LOAD DATABASE */
+                                    dcoachDB.importData();
 
-                                        /* ON INIT LOAD DATABASE */
-                                        dcoachDB.importData();
 
+                                } else {
+
+
+                                    /* NEW UPDATE CHECK */
+
+                                    var i = 0,
+                                        row;
+
+                                    var u = 0;
+
+                                    for (var r = 0; r < results.rows.length; r++) {
+                                        var updatedate = new Date(results.rows.item(r).date);
+                                    }
+
+                                    /* Product last update file information */
+                                    var productjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json"));
+                                    var productupdatefile = productjson.toLocaleString("de");
+
+                                    console.log(productjson + '--' + updatedate);
+
+                                    if (productjson.valueOf() > updatedate.valueOf()) {
+                                        u = u + 1;
+                                    }
+
+                                    /* Product attribute last update file information */
+                                    var productattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json"));
+                                    var productattributeupdatefile = productattributejson.toLocaleString("de");
+
+                                    console.log(productattributejson + '--' + updatedate);
+
+                                    if (productattributejson.valueOf() > updatedate.valueOf()) {
+                                        u = u + 1;
+                                    }
+
+                                    /* Product company last update file information */
+                                    var productcompanyjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json"));
+                                    var productcompanyupdatefile = productcompanyjson.toLocaleString("de");
+
+                                    console.log(productcompanyjson + '--' + updatedate);
+
+                                    if (productcompanyjson.valueOf() > updatedate.valueOf()) {
+                                        u = u + 1;
+                                    }
+
+                                    /* Product company last update file information */
+                                    var productcompanyattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json"));
+                                    var productcompanyupdatefile = productcompanyattributejson.toLocaleString("de");
+
+                                    console.log(productcompanyattributejson + '--' + updatedate);
+
+                                    if (productcompanyattributejson.valueOf() > updatedate.valueOf()) {
+                                        u = u + 1;
+                                    }
+
+                                    if (u > 0) {
+
+                                        $j('.webapp-product-sync-row').css('visibility', 'visible');
+                                        $j('.webapp-product-sync-row').css('position', 'relative');
+
+                                        $j('.webapp-product-sync-content').html('<h4>Es sind neue Daten vom ' + productcompanyattributejson.toLocaleString("de") + ' zum Abrufen bereit</h4>');
+
+                                        $j('#webapp-product-sync-but').on('click', function() {
+
+                                            $j("#tabs").tabs("option", "active", 4);
+                                            dcoachDB.importData();
+
+                                        });
+                                        alert("Neues Update")
 
                                     } else {
 
+                                        alert("Kein neues Update");
 
-                                        /* NEW UPDATE CHECK */
+                                        WEBAPPDB.transaction(
+                                            function(transaction) {
+                                                transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
 
-                                        var i = 0,
-                                        row;
+                                            }
+                                        );
 
-                                        var u = 0;
+                                        $j("#webapp-product-data").listview('refresh');
+                                        $j('#loading-img').css('display', 'none');
 
-                                        for (var r = 0; r < results.rows.length; r++) {
-                                            var updatedate = new Date(results.rows.item(r).date);
-                                        }
-
-                                        /* Product last update file information */
-                                        var productjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json"));
-                                        var productupdatefile = productjson.toLocaleString("de");
-
-                                        console.log(productjson + '--' + updatedate);
-
-                                        if (productjson.valueOf() > updatedate.valueOf()) {
-                                            u = u + 1;
-                                        }
-
-                                        /* Product attribute last update file information */
-                                        var productattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json"));
-                                        var productattributeupdatefile = productattributejson.toLocaleString("de");
-
-                                        console.log(productattributejson + '--' + updatedate);
-
-                                        if (productattributejson.valueOf() > updatedate.valueOf()) {
-                                            u = u + 1;
-                                        }
-
-                                        /* Product company last update file information */
-                                        var productcompanyjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json"));
-                                        var productcompanyupdatefile = productcompanyjson.toLocaleString("de");
-
-                                        console.log(productcompanyjson + '--' + updatedate);
-
-                                        if (productcompanyjson.valueOf() > updatedate.valueOf()) {
-                                            u = u + 1;
-                                        }
-
-                                        /* Product company last update file information */
-                                        var productcompanyattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json"));
-                                        var productcompanyupdatefile = productcompanyattributejson.toLocaleString("de");
-
-                                        console.log(productcompanyattributejson + '--' + updatedate);
-
-                                        if (productcompanyattributejson.valueOf() > updatedate.valueOf()) {
-                                            u = u + 1;
-                                        }
-
-                                        if (u > 0) {
-
-                                            $j('.webapp-product-sync-row').css('visibility', 'visible');
-                                            $j('.webapp-product-sync-row').css('position', 'relative');
-
-                                            $j('.webapp-product-sync-content').html('<h4>Es sind neue Daten vom ' + productcompanyattributejson.toLocaleString("de") + ' zum Abrufen bereit</h4>');
-
-                                            $j('#webapp-product-sync-but').on('click', function () {
-
-                                                $j("#tabs").tabs("option", "active", 4);
-                                                dcoachDB.importData();
-
-                                            });
-                                            alert("Neues Update")
-
-                                        } else {
-
-                                            alert("Kein neues Update");
-
-                                            WEBAPPDB.transaction(
-                                                function (transaction) {
-                                                    transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
-
-                                                }
-                                                );
-
-                                            $j("#webapp-product-data").listview('refresh');
-                                            $j('#loading-img').css('display', 'none');
-
-
-                                        }
-
-                                        /* NEW UPDATE CHECK */
 
                                     }
-                                    ;
 
-                                });
-}
-);
+                                    /* NEW UPDATE CHECK */
 
-}
+                                };
 
-} catch (e) {
+                            });
+                        }
+                    );
 
-    if (e === 2) {
+                }
+
+            } catch (e) {
+
+                if (e === 2) {
                     // Version mismatch.
                     console.log("Invalid database version.");
                 } else {
@@ -1090,7 +1274,7 @@ function convertMathCharacters(str){
          **** INTERNET STATUS **
          ***/
 
-         offlineStatusMessage: function () {
+        offlineStatusMessage: function() {
 
             alert('Bitte verbinden Sie sich mit dem Internet.');
             //$j("#tabs").tabs("option", "active", 0);
@@ -1102,27 +1286,27 @@ function convertMathCharacters(str){
          **** IMPORT DATA **
          ***/
 
-         importData: function () {
+        importData: function() {
 
             /* INSERT PRODUCT */
 
             $j('#loading-img').css('display', 'block');
-
+            //dcoachDB.syncData();
             var that = this;
 
             var url = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json";
             var productdata = [];
 
-            $j.getJSON(url, function (data) {
+            $j.getJSON(url, function(data) {
 
                 if (data.length > 0) {
                     var remoteImages = [];
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             transaction.executeSql("DELETE FROM webapp_product", []);
                         }
-                        );
+                    );
 
                     for (var d = 0; d < data.length; d++) {
                         console.log(data[d]['product_img']);
@@ -1134,13 +1318,13 @@ function convertMathCharacters(str){
                     that.downloadImages(remoteImages, 1);
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             for (var e = 0; e < productdata.length; e++) {
                                 transaction.executeSql("INSERT INTO webapp_product(id, product_name, product_description, product_img, product_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata[e][0], productdata[e][1], productdata[e][2], productdata[e][3], productdata[e][4]]);
 
                             }
                         }
-                        );
+                    );
                 }
 
             });
@@ -1153,28 +1337,28 @@ function convertMathCharacters(str){
             var productdata1 = [];
 
 
-            $j.getJSON(url1, function (data) {
+            $j.getJSON(url1, function(data) {
 
                 if (data.length > 0) {
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             transaction.executeSql("DELETE FROM webapp_product_company", []);
                         }
-                        );
+                    );
 
                     for (var d = 0; d < data.length; d++) {
                         productdata1[d] = [data[d]['id'], data[d]['product_id'], data[d]['company_name'], data[d]['product_name'], data[d]['company_reg_date']];
                     }
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             for (var e = 0; e < productdata1.length; e++) {
                                 transaction.executeSql("INSERT INTO webapp_product_company(id, product_id, company_name, product_name, company_reg_date) VALUES (?, ?, ?, ?, ?)", [productdata1[e][0], productdata1[e][1], productdata1[e][2], productdata1[e][3], productdata1[e][4]]);
 
                             }
                         }
-                        );
+                    );
                 }
 
             });
@@ -1186,28 +1370,28 @@ function convertMathCharacters(str){
             var url2 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json";
             var productdata2 = [];
 
-            $j.getJSON(url2, function (data) {
+            $j.getJSON(url2, function(data) {
 
                 if (data.length > 0) {
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             transaction.executeSql("DELETE FROM webapp_product_attribute", []);
                         }
-                        );
+                    );
 
                     for (var d = 0; d < data.length; d++) {
                         productdata2[d] = [data[d]['id'], data[d]['product_id'], data[d]['attribute_name'], data[d]['attribute_id'], data[d]['value'], data[d]['ordering']];
                     }
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
 
                             for (var e = 0; e < productdata2.length; e++) {
                                 transaction.executeSql("INSERT INTO webapp_product_attribute(id, product_id, attribute_name, attribute_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata2[e][0], productdata2[e][1], productdata2[e][2], productdata2[e][3], productdata2[e][4], productdata2[e][5]]);
                             }
 
                         }
-                        );
+                    );
                 }
             });
 
@@ -1220,15 +1404,15 @@ function convertMathCharacters(str){
             var productdata3 = [];
 
 
-            $j.getJSON(url3, function (data) {
+            $j.getJSON(url3, function(data) {
 
                 if (data.length > 0) {
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             transaction.executeSql("DELETE FROM webapp_company_attribute", []);
                         }
-                        );
+                    );
 
 
                     for (var d = 0; d < data.length; d++) {
@@ -1237,12 +1421,12 @@ function convertMathCharacters(str){
 
 
                     WEBAPPDB.transaction(
-                        function (transaction) {
+                        function(transaction) {
                             for (var e = 0; e < productdata3.length; e++) {
                                 transaction.executeSql("INSERT INTO webapp_company_attribute(id, attribute_id, product_id, company_id, value, ordering) VALUES (?, ?, ?, ?, ?, ?)", [productdata3[e][0], productdata3[e][1], productdata3[e][2], productdata3[e][3], productdata3[e][4], productdata3[e][5]]);
                             }
                         }
-                        );
+                    );
 
                 }
 
@@ -1254,7 +1438,7 @@ function convertMathCharacters(str){
 
             var currentdate = new Date();
             WEBAPPDB.transaction(
-                function (transaction) {
+                function(transaction) {
                     transaction.executeSql("DELETE FROM webapp_update", []);
                     transaction.executeSql("INSERT INTO webapp_update(date) VALUES (?)", [currentdate]);
                     $j('.webapp-product-sync-row').css('visibility', 'hidden');
@@ -1262,15 +1446,15 @@ function convertMathCharacters(str){
                     $j("#webapp-product-data").listview('refresh');
                     $j("#tabs").tabs("option", "active", 0);
                 }
-                );
+            );
 
 
             /* UPDATE FOOTER DATE */
 
 
             WEBAPPDB.transaction(
-                function (transaction) {
-                    transaction.executeSql("SELECT * FROM webapp_update;", [], function (transaction, results) {
+                function(transaction) {
+                    transaction.executeSql("SELECT * FROM webapp_update;", [], function(transaction, results) {
 
                         if (results.rows.length != 0) {
 
@@ -1284,7 +1468,7 @@ function convertMathCharacters(str){
                         }
                     });
                 }
-                );
+            );
 
 
             /* UPDATE END */
@@ -1296,7 +1480,7 @@ function convertMathCharacters(str){
          **** DOWNLOAD IMAGE **
          ***/
 
-         downloadImages: function (remoteImages, count) {
+        downloadImages: function(remoteImages, count) {
 
             var path = cordova.file.dataDirectory;
             var fileTransfer = new FileTransfer();
@@ -1305,40 +1489,40 @@ function convertMathCharacters(str){
             fileTransfer.download(
                 uri,
                 path + "www/img/product/" + remoteImages[count - 1],
-                function (entry) {
+                function(entry) {
                     if (count <= remoteImages.length) {
                         console.log('Image Download');
                         dcoachDB.downloadImages(remoteImages, count + 1);
                     } else {
                         console.log('Done');
                         WEBAPPDB.transaction(
-                            function (transaction) {
+                            function(transaction) {
                                 transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
 
                             }
-                            );
+                        );
 
                         $j("#webapp-product-data").listview('refresh');
                     }
                 },
-                function (error) {
+                function(error) {
                     if (count <= remoteImages.length) {
                         console.log('Image Download');
                         dcoachDB.downloadImages(remoteImages, count + 1);
                     } else {
                         console.log('Done');
                         WEBAPPDB.transaction(
-                            function (transaction) {
+                            function(transaction) {
                                 transaction.executeSql("SELECT * FROM webapp_product;", [], dcoachDB.getProducts, dcoachDB.errorHandler);
 
                             }
-                            );
+                        );
 
                         $j("#webapp-product-data").listview('refresh');
                         $j('#loading-img').css('display', 'none');
                     }
                 }
-                );
+            );
 
         },
 
@@ -1347,10 +1531,10 @@ function convertMathCharacters(str){
          **** GET PRODUCT LIST **
          ***/
 
-         getProducts: function (transaction, results) {
+        getProducts: function(transaction, results) {
 
             var i = 0,
-            row;
+                row;
 
             var product_array = [];
 
@@ -1370,7 +1554,7 @@ function convertMathCharacters(str){
                 localStorage.setItem('products', JSON.stringify(product_array));
                 items = JSON.parse(localStorage.getItem('products'));
                 $j('#webapp-product-data').html('');
-                $j.each(items, $j.proxy(function (i, item) {
+                $j.each(items, $j.proxy(function(i, item) {
                     ///var path = window.location.pathname;
                     //path = path.substr( path, path.length - 18 );
                     var path = cordova.file.dataDirectory;
@@ -1394,10 +1578,10 @@ function convertMathCharacters(str){
          **** GET PRODUCT COMPANY **
          ***/
 
-         productCompany: function (transaction, results) {
+        productCompany: function(transaction, results) {
 
             var i = 0,
-            row;
+                row;
 
             var product_com_array = [];
 
@@ -1421,7 +1605,7 @@ function convertMathCharacters(str){
 
                 $j('#webapp-product-com-list').html('');
 
-                $j.each(items, $j.proxy(function (i, item) {
+                $j.each(items, $j.proxy(function(i, item) {
 
                     $j('#webapp-product-com-list').append('<li class="ui-li-has-thumb ui-first-child"><div class="ui-checkbox"><label for="checkbox-enhanced" class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off">' + item.product_name + '</label><input type="checkbox" webapp-product-company-value[] id="checkbox-enhanced" data-enhanced="true" value="' + item.id + '" data-company-name="' + item.product_name + '" data-cproduct-name="' + item.company_name + '"></div></li>');
                     $j('#webapp-product-com-list li input[type=checkbox]').checkboxradio().trigger('create');
@@ -1446,10 +1630,10 @@ function convertMathCharacters(str){
          **** GET PRODUCT ATTRIBUTES **
          ***/
 
-         productAttribute: function (transaction, results) {
+        productAttribute: function(transaction, results) {
 
             var i = 0,
-            row;
+                row;
 
             var product_attr_attry = [];
 
@@ -1472,7 +1656,7 @@ function convertMathCharacters(str){
 
                 $j('#webapp-product-attr-ul').html('');
 
-                $j.each(items, $j.proxy(function (i, item) {
+                $j.each(items, $j.proxy(function(i, item) {
 
                     $j('#webapp-product-attr-ul').append('<li class="ui-li-has-thumb ui-first-child"><div class="ui-checkbox"><label for="checkbox-enhanced" class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off">' + item.attribute_name + '</label><input type="checkbox" name="webapp-product-attr-value[]" id="checkbox-enhanced" data-enhanced="true" value="' + item.id + '"></div></li>');
                     $j('#webapp-product-attr-ul input[type=checkbox]').checkboxradio().trigger('create');
@@ -1498,10 +1682,10 @@ function convertMathCharacters(str){
          **** GET SELECT PRODUCT ATTRIBUTES LIST **
          ***/
 
-         productSelectAttribute: function (transaction, results) {
+        productSelectAttribute: function(transaction, results) {
 
             var i = 0,
-            row;
+                row;
             var productselecteddata = [];
 
             if (results.rows.length > 0) {
@@ -1525,22 +1709,22 @@ function convertMathCharacters(str){
 
         },
 
-        addCompanyAttribute: function (transaction, results) {
+        addCompanyAttribute: function(transaction, results) {
 
             var i = 0,
-            row;
+                row;
 
 
         },
 
 
-        companySelectAttribute: function (transaction, results) {
+        companySelectAttribute: function(transaction, results) {
 
             $j("#sortable").sortable("refresh");
             $j("#sortable").sortable("refreshPositions");
 
             var i = 0,
-            row;
+                row;
 
             var selectedCompanyArray = localStorage.getItem('company-id');
             var selectedCompany = selectedCompanyArray.split(",");
@@ -1638,37 +1822,40 @@ function convertMathCharacters(str){
 
                 /* MATCH HEIGHT */
 
+                setTimeout(function(){ 
+                    var maxNameHeight = Math.max($j('.webapp-dproduct-name-0 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-0 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-1 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-2 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-3 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-4 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-5 .webapp-nested-name-block').height());
 
-                var maxNameHeight = Math.max($j('.webapp-dproduct-name-0 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-0 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-1 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-2 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-3 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-4 .webapp-nested-name-block').height(), $j('.webapp-cproduct-name-5 .webapp-nested-name-block').height());
+                    $j('.webapp-dproduct-name .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-dproduct-name-0 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-0 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-1 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-2 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-3 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-4 .webapp-nested-name-block').height((maxNameHeight - 1));
+                    $j('.webapp-cproduct-name-5 .webapp-nested-name-block').height((maxNameHeight - 1));
+    
+    
+                    for (var h = 0; h < selectedProductAttribute.length; h++) {
+    
+                        var propertertyblock = $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height() + ',';
+                        var dproductblock = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height() + ',';
+    
+    
+                        var maxHeight = Math.max($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-0 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-1 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-2 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-3 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-4 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height());
+    
+                        $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-0 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-1 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-2 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-3 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-4 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+                        $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
+    
+                    }
+                 }, 500);
 
-                $j('.webapp-dproduct-name .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-dproduct-name-0 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-0 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-1 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-2 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-3 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-4 .webapp-nested-name-block').height((maxNameHeight - 1));
-                $j('.webapp-cproduct-name-5 .webapp-nested-name-block').height((maxNameHeight - 1));
-
-
-                for (var h = 0; h < selectedProductAttribute.length; h++) {
-
-                    var propertertyblock = $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height() + ',';
-                    var dproductblock = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height() + ',';
-
-
-                    var maxHeight = Math.max($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-0 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-1 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-2 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-3 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-4 .webapp-nested-attri-block').eq(h).height(), $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height());
-
-                    $j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-0 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-1 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-2 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-3 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-4 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-                    $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
-
-                }
+                
 
             }
             //h update dynamic width
@@ -1679,27 +1866,27 @@ function convertMathCharacters(str){
 
         /* POTRATE PDF GENERATION */
 
-        generatePDF: function () {
+        generatePDF: function() {
 
             var columnsarray = [];
             var rowsarray = [];
 
-            $j('.webapp-dproduct-name-property .webapp-dproduct-name').each(function (i) {
+            $j('.webapp-dproduct-name-property .webapp-dproduct-name').each(function(i) {
                 if ($j('.webapp-dproduct-name-property .webapp-dproduct-name').eq(i).text() != "") {
                     columnsarray.push(" ")
                 }
             });
 
-            $j('.webapp-dproduct-name-value .webapp-dproduct-name-0').each(function (i) {
+            $j('.webapp-dproduct-name-value .webapp-dproduct-name-0').each(function(i) {
                 if ($j('.webapp-dproduct-name-value .webapp-dproduct-name-0').eq(i).text() != "") {
-                   // columnsarray.push($j('.webapp-dproduct-name-value .webapp-dproduct-name-0').eq(i).text())
-                   var txtProd = $j(this).find('.webapp-nested-name-block h4').text();
-                   var txtCom = $j(this).find('.webapp-nested-name-block h2').text();
-                   columnsarray.push(txtProd + '\n' + txtCom)
-               }
-           });
+                    // columnsarray.push($j('.webapp-dproduct-name-value .webapp-dproduct-name-0').eq(i).text())
+                    var txtProd = $j(this).find('.webapp-nested-name-block h4').text();
+                    var txtCom = $j(this).find('.webapp-nested-name-block h2').text();
+                    columnsarray.push(txtProd + '\n' + txtCom)
+                }
+            });
 
-            $j('.webapp-cproduct-value').each(function (i) {
+            $j('.webapp-cproduct-value').each(function(i) {
                 if ($j(this).find('.webapp-cproduct-names .webapp-nested-name-block').text() != "") {
                     //columnsarray.push($j(this).find('.webapp-cproduct-names .webapp-nested-name-block').text())
                     var txtProd = $j(this).find('.webapp-cproduct-names .webapp-nested-name-block h4').text();
@@ -1709,7 +1896,7 @@ function convertMathCharacters(str){
             });
 
 
-            $j('.webapp-dproduct-name-property .webapp-nested-attri-block').each(function (i) {
+            $j('.webapp-dproduct-name-property .webapp-nested-attri-block').each(function(i) {
 
                 var parray = [];
                 var carray = [];
@@ -1717,9 +1904,9 @@ function convertMathCharacters(str){
                 var txtValue2 = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text();
 
                 txtValue1 = convertMathCharacters(txtValue1);
-                txtValue2 = convertMathCharacters(txtValue2);           
-                parray.push(txtValue1,txtValue2);
-                $j('#sortable .webapp-cproduct-value').each(function (j) {
+                txtValue2 = convertMathCharacters(txtValue2);
+                parray.push(txtValue1, txtValue2);
+                $j('#sortable .webapp-cproduct-value').each(function(j) {
 
                     if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
                         var txtVal2 = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
@@ -1756,8 +1943,8 @@ function convertMathCharacters(str){
                         fontStyle: 'normal'
                     }
                 },
-                margin: {top: 0, left: 20, right: 20, bottom: 20},
-                createdCell: function (cell, data) {
+                margin: { top: 0, left: 20, right: 20, bottom: 20 },
+                createdCell: function(cell, data) {
                     if (data.column.dataKey === 0) {
                         cell.styles.textColor = [77, 77, 79];
                         // cell.styles.fillColor = [255, 255, 255];
@@ -1789,8 +1976,8 @@ function convertMathCharacters(str){
                 $j.ajax({
                     method: "POST",
                     url: "http://product.compare.2281008-0401.anx-cus.net/pdf/pdf.php",
-                    data: {data: pdfdata},
-                }).done(function (data) {
+                    data: { data: pdfdata },
+                }).done(function(data) {
 
                     //cordova.InAppBrowser.open('https://docs.google.com/viewer?url=https://docs.google.com/viewer?url=http://product.compare.2281008-0401.anx-cus.net/pdf/'+data, '_blank','location=yes');
                     window.open('http://product.compare.2281008-0401.anx-cus.net/pdf/' + data, '_system', 'location=yes');
@@ -1803,18 +1990,18 @@ function convertMathCharacters(str){
 
         /* LANDSCAPE PDF GENERATION */
 
-        generateLandPDF: function () {
+        generateLandPDF: function() {
 
             var columnsarray = [];
             var rowsarray = [];
 
-            $j('.webapp-dproduct-name-property .webapp-dproduct-name').each(function (i) {
+            $j('.webapp-dproduct-name-property .webapp-dproduct-name').each(function(i) {
                 if ($j('.webapp-dproduct-name-property .webapp-dproduct-name').eq(i).text() != "") {
                     columnsarray.push(" ")
                 }
             });
 
-            $j('.webapp-dproduct-name-value .webapp-dproduct-name-0').each(function (i) {
+            $j('.webapp-dproduct-name-value .webapp-dproduct-name-0').each(function(i) {
                 if ($j('.webapp-dproduct-name-value .webapp-dproduct-name-0').eq(i).text() != "") {
                     //columnsarray.push($j('.webapp-dproduct-name-value .webapp-dproduct-name-0').eq(i).text())
                     var txtProd = $j(this).find('.webapp-nested-name-block h4').text();
@@ -1823,17 +2010,17 @@ function convertMathCharacters(str){
                 }
             });
 
-            $j('.webapp-cproduct-value').each(function (i) {
+            $j('.webapp-cproduct-value').each(function(i) {
                 if ($j(this).find('.webapp-cproduct-names .webapp-nested-name-block').text() != "") {
-                   // columnsarray.push($j(this).find('.webapp-cproduct-names .webapp-nested-name-block').text())
-                   var txtProd = $j(this).find('.webapp-cproduct-names .webapp-nested-name-block h4').text();
-                   var txtCom = $j(this).find('.webapp-cproduct-names .webapp-nested-name-block h2').text();
-                   columnsarray.push(txtProd + '\n' + txtCom)
-               }
-           });
+                    // columnsarray.push($j(this).find('.webapp-cproduct-names .webapp-nested-name-block').text())
+                    var txtProd = $j(this).find('.webapp-cproduct-names .webapp-nested-name-block h4').text();
+                    var txtCom = $j(this).find('.webapp-cproduct-names .webapp-nested-name-block h2').text();
+                    columnsarray.push(txtProd + '\n' + txtCom)
+                }
+            });
 
 
-            $j('.webapp-dproduct-name-property .webapp-nested-attri-block').each(function (i) {
+            $j('.webapp-dproduct-name-property .webapp-nested-attri-block').each(function(i) {
 
                 var parray = [];
                 var carray = [];
@@ -1841,22 +2028,22 @@ function convertMathCharacters(str){
                 var txtValue2 = $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text();
 
                 txtValue1 = convertMathCharacters(txtValue1);
-                txtValue2 = convertMathCharacters(txtValue2);           
-                parray.push(txtValue1,txtValue2);
+                txtValue2 = convertMathCharacters(txtValue2);
+                parray.push(txtValue1, txtValue2);
 
-               // parray.push($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text());
-               $j('#sortable .webapp-cproduct-value').each(function (j) {
+                // parray.push($j('.webapp-dproduct-name-property .webapp-nested-attri-block').eq(i).text(), $j('.webapp-dproduct-name-value .webapp-nested-attri-block').eq(i).text());
+                $j('#sortable .webapp-cproduct-value').each(function(j) {
 
-                if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
-                     //var txtVal = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
-                     var txtVal2 = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
-                     txtVal2 = convertMathCharacters(txtVal2);
-                     carray.push(txtVal2);
-                 }
+                    if ($j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text() != '') {
+                        //var txtVal = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
+                        var txtVal2 = $j('#sortable .webapp-cproduct-value').eq(j).find('.webapp-nested-attri-block').eq(i).text();
+                        txtVal2 = convertMathCharacters(txtVal2);
+                        carray.push(txtVal2);
+                    }
 
-             });
+                });
 
-               rowsarray.push($j.merge($j.merge([], parray), carray));
+                rowsarray.push($j.merge($j.merge([], parray), carray));
 
             });
 
@@ -1868,7 +2055,7 @@ function convertMathCharacters(str){
                 theme: 'grid',
                 tableWidth: 'auto',
                 pageBreak: 'auto',
-                fontSize:9,
+                fontSize: 9,
                 styles: {
                     overflow: 'linebreak',
                     halign: 'left',
@@ -1885,8 +2072,8 @@ function convertMathCharacters(str){
                         fontStyle: 'normal'
                     }
                 },
-                margin: {top: 0, left: 20, right: 20, bottom: 20},
-                createdCell: function (cell, data) {
+                margin: { top: 0, left: 20, right: 20, bottom: 20 },
+                createdCell: function(cell, data) {
                     if (data.column.dataKey === 0) {
                         cell.styles.textColor = [77, 77, 79];
                         // cell.styles.fillColor = [255, 255, 255];
@@ -1917,8 +2104,8 @@ function convertMathCharacters(str){
                 $j.ajax({
                     method: "POST",
                     url: "http://product.compare.2281008-0401.anx-cus.net/pdf/pdf.php",
-                    data: {data: pdfdata},
-                }).done(function (data) {
+                    data: { data: pdfdata },
+                }).done(function(data) {
 
                     window.open('http://product.compare.2281008-0401.anx-cus.net/pdf/' + data, '_system', 'location=yes');
 
@@ -1931,11 +2118,11 @@ function convertMathCharacters(str){
 
         /* FOOTER DATE UPDATE FIELD */
 
-        lastUpdate: function () {
+        lastUpdate: function() {
 
             WEBAPPDB.transaction(
-                function (transaction) {
-                    transaction.executeSql("SELECT * FROM webapp_update;", [], function (transaction, results) {
+                function(transaction) {
+                    transaction.executeSql("SELECT * FROM webapp_update;", [], function(transaction, results) {
 
                         if (results.rows.length != 0) {
                             for (var r = 0; r < results.rows.length; r++) {
@@ -1967,46 +2154,45 @@ function urlDate(U) {
     X.open('GET', U, false);
     try {
         X.send();
-    } catch (y) {
-    }
+    } catch (y) {}
     var dt = X.getResponseHeader("Last-Modified");
     console.log(JSON.stringify(dt));
     return dt ? new Date(dt).toString() : new Date(1970, 0, 0);
 }
 
 
-function dynamicWidth(){
+function dynamicWidth() {
 
     var minWidth = 3
-    var countCompareItem =  jQuery('#sortable li.webapp-cproduct-value .webapp-cproduct-names').length ;
+    var countCompareItem = jQuery('#sortable li.webapp-cproduct-value .webapp-cproduct-names').length;
     var outWidth = jQuery('.box-three').width();
     var propertyWidth = jQuery('.webapp-dproduct-name-property').width();
     var nameWidth = jQuery('.webapp-dproduct-name-value').width();
 
     var maxWidthResize = outWidth - propertyWidth;
-    var widthSize = maxWidthResize / (countCompareItem +1);
+    var widthSize = maxWidthResize / (countCompareItem + 1);
 
 
     var widthNeedRemove = 2 * outWidth / 100;
 
-    if(countCompareItem  == 1){
-       // widthNeedRemove = 20;
-   }
-   widthSize = widthSize - widthNeedRemove;
+    if (countCompareItem == 1) {
+        // widthNeedRemove = 20;
+    }
+    widthSize = widthSize - widthNeedRemove;
 
 
 
-   jQuery('.webapp-dproduct-name-value').width(widthSize);
-   jQuery('.webapp-dproduct-name-0').width(widthSize);
-   jQuery('.webapp-cproduct-value').width(widthSize);
-   jQuery('#sortable').css('width','auto');
+    jQuery('.webapp-dproduct-name-value').width(widthSize);
+    jQuery('.webapp-dproduct-name-0').width(widthSize);
+    jQuery('.webapp-cproduct-value').width(widthSize);
+    jQuery('#sortable').css('width', 'auto');
 
-   jQuery('#sortable li.webapp-cproduct-value .webapp-cproduct-names').each(function(){
-    jQuery(this).width(widthSize);
-    jQuery(this).parent().width(widthSize);
-})
+    jQuery('#sortable li.webapp-cproduct-value .webapp-cproduct-names').each(function() {
+        jQuery(this).width(widthSize);
+        jQuery(this).parent().width(widthSize);
+    })
 }
 
 jQuery(window).bind('orientationchange', function(event) {
-  dynamicWidth();
+    dynamicWidth();
 });

@@ -32,12 +32,12 @@ $j(function(){
 				if (!window.openDatabase) {
 					alert('Local Databases are not supported by your browser. Please use a Webkit browser for this demo');
 				} else {
-					var shortName = 'WEBAPPDB',
+					var shortName = 'WEBAPPDBAP',
 					version = '1.0',
 					displayName = 'DCOACH DATABASE',
 						maxSize = 100000; // in bytes
 						
-						WEBAPPDB = window.openDatabase(shortName, version, displayName, maxSize);
+						WEBAPPDBAT = window.openDatabase(shortName, version, displayName, maxSize);
 						this.createTables();
 					}
 				} catch(e) {
@@ -57,7 +57,7 @@ $j(function(){
 		
 		createTables: function() {
 			var that = this;
-			WEBAPPDB.transaction(
+			WEBAPPDBAT.transaction(
 				function (transaction) {
 					
 					//id INTEGER NOT NULL PRIMARY KEY
@@ -68,11 +68,11 @@ $j(function(){
 					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_user(id INTEGER NOT NULL PRIMARY KEY, username VARCHAR, password VARCHAR);', [], that.nullDataHandler, that.errorHandler);
 					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
 					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_file_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
-					
+					console.log(transaction)
 				}
 				);
 			
-			this.checkUser();
+			//this.checkUser();
 			
 			
 		},
@@ -83,7 +83,7 @@ $j(function(){
 		
 		checkUser: function(){
 			var that = this;
-			WEBAPPDB.transaction(
+			WEBAPPDBAT.transaction(
 				function (transaction) {
 					transaction.executeSql("SELECT * FROM webapp_user WHERE username != 'user' AND password != 'compare';", [], that.userSelectHandler, that.errorHandler);
 				}
@@ -101,14 +101,14 @@ $j(function(){
 			
 			if(results.rows.length == 0){
 				
-				WEBAPPDB.transaction(
+				WEBAPPDBAT.transaction(
 					function (transaction) {
 						//Starter data when page is initialized  				
 						transaction.executeSql("DELETE FROM webapp_user", []);
 					}
 					);
 				
-				WEBAPPDB.transaction(
+				WEBAPPDBAT.transaction(
 					function (transaction) {
 						//Starter data when page is initialized
 						var data = ['user','compare'];  				
@@ -116,7 +116,7 @@ $j(function(){
 					}
 					);
 				
-				WEBAPPDB.transaction(
+				WEBAPPDBAT.transaction(
 					function (transaction) {
 						//Starter data when page is initialized
 						var newdate = new Date();
@@ -137,7 +137,7 @@ $j(function(){
 		loginCheck: function() {
 			
 			var that = this;
-			WEBAPPDB.transaction(
+			WEBAPPDBAT.transaction(
 				function (transaction) {
 					transaction.executeSql("SELECT * FROM webapp_user WHERE username='"+$j('#username').val()+"' AND password='"+$j('#password').val()+"';", [], that.loginMessage, that.errorHandler);
 				}

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.phonegap.comparee.at" version="1.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="com.phonegap.comparee" version="1.1.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
     <feature name="Camera">
         <param name="browser-package" value="Camera" />
     </feature>
@@ -7,8 +7,8 @@
         <param name="browser-package" value="Device" />
     </feature>
     <name>compare at</name>
-    <description>Hello World sample application that responds to the deviceready event.</description>
-    <author email="support@phonegap.com" href="http://phonegap.com">PhoneGap Team</author>
+    <description>compare at.</description>
+    <author email="support@phonegap.com" href="http://phonegap.com">Compare Team</author>
     <content src="index.html" />
     <icon src="icon.png" />
     <icon height="180" platform="ios" src="res/icon/ios/icon-60@3x.png" width="180" />
@@ -73,7 +73,7 @@
     <preference name="show-splash-screen-spinner" value="true" />
     <preference name="auto-hide-splash-screen" value="true" />
     <preference name="disable-cursor" value="false" />
-    <preference name="android-minSdkVersion" value="14" />
+    <preference name="android-minSdkVersion" value="24" />
     <preference name="android-installLocation" value="auto" />
     <preference name="phonegap-version" value="cli-6.5.0" />
 </widget>

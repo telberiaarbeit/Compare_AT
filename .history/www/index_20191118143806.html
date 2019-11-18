@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src *; img-src *; frame-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline' *;">
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>CSLB Compare Frontend Panel</title>
+    </head>
+    <body onLoad="onLoad();">
+        <div class="app"> <img src="img/logo.png" /> </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript">
+		
+		  function onLoad() {
+			  document.addEventListener("deviceready", onDeviceReady, false);
+		  }
+	
+		  function onDeviceReady() {
+            try {
+				if (!window.openDatabase) {
+					alert('Local Databases are not supported by your browser. Please use a Webkit browser for this demo');
+				} else {
+					var shortName = 'WEBAPPDBAP',
+					version = '1.0',
+					displayName = 'DCOACH DATABASE',
+						maxSize = 100000; // in bytes
+						
+						WEBAPPDBAT = window.openDatabase(shortName, version, displayName, maxSize);
+						WEBAPPDBAT.transaction(
+                            function (transaction) {
+                                
+                                //id INTEGER NOT NULL PRIMARY KEY
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_company_attribute(id NUMBER, attribute_id NUMBER, product_id NUMBER, company_id NUMBER, value TEXT, ordering NUMBER);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product(id NUMBER, product_name VARCHAR, product_description TEXT, product_img VARCHAR, product_reg_date DATE);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_attribute(id NUMBER, product_id NUMBER, attribute_name VARCHAR, attribute_id NUMBER, value TEXT, ordering NUMBER);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_company(id NUMBER, product_id NUMBER, company_name VARCHAR, product_name VARCHAR, company_reg_date DATE);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_user(id INTEGER NOT NULL PRIMARY KEY, username VARCHAR, password VARCHAR);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
+                                transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_file_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
+                            }
+				);
+					}
+				} catch(e) {
+					if (e === 2) {
+			        // Version mismatch.
+			        console.log("Invalid database version.");
+			    } else {
+			    	console.log("Unknown error "+ e +".");
+			    }
+			    return;
+			}             
+            
+			  location.assign("selectproduct.html");
+		  }
+		  $j(function(){ 
+	
+        var dcoachDB = {
+            
+            init: function () {
+                
+                dcoachDB.initDatabase();
+                
+            },
+
+		initDatabase: function() {
+			try {
+				if (!window.openDatabase) {
+					alert('Local Databases are not supported by your browser. Please use a Webkit browser for this demo');
+				} else {
+					var shortName = 'WEBAPPDBAP',
+					version = '1.0',
+					displayName = 'DCOACH DATABASE',
+						maxSize = 100000; // in bytes
+						
+						WEBAPPDBAT = window.openDatabase(shortName, version, displayName, maxSize);
+						this.createTables();
+					}
+				} catch(e) {
+					if (e === 2) {
+			        // Version mismatch.
+			        console.log("Invalid database version.");
+			    } else {
+			    	console.log("Unknown error "+ e +".");
+			    }
+			    return;
+			} 
+		},
+		
+		/***
+		**** CREATE TABLE ** 
+		***/
+		
+		createTables: function() {
+			var that = this;
+			WEBAPPDBAT.transaction(
+				function (transaction) {
+					
+					//id INTEGER NOT NULL PRIMARY KEY
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_company_attribute(id NUMBER, attribute_id NUMBER, product_id NUMBER, company_id NUMBER, value TEXT, ordering NUMBER);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product(id NUMBER, product_name VARCHAR, product_description TEXT, product_img VARCHAR, product_reg_date DATE);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_attribute(id NUMBER, product_id NUMBER, attribute_name VARCHAR, attribute_id NUMBER, value TEXT, ordering NUMBER);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_product_company(id NUMBER, product_id NUMBER, company_name VARCHAR, product_name VARCHAR, company_reg_date DATE);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_user(id INTEGER NOT NULL PRIMARY KEY, username VARCHAR, password VARCHAR);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
+					transaction.executeSql('CREATE TABLE IF NOT EXISTS webapp_file_update(id INTEGER NOT NULL PRIMARY KEY, date DATETIME);', [], that.nullDataHandler, that.errorHandler);
+				}
+				);
+			
+			//this.checkUser();
+			
+			
+		},
+		
+		
+		
+	
+		
+		/***
+		**** HANDLER ** 
+		***/
+		
+		errorHandler: function( transaction, error ) {
+			
+			if (error.code===1){
+				
+				console.log("DB Table already exists");
+				
+			} else {
+				
+				console.log('Oops.  Error was '+error.message+' (Code '+ error.code +')');
+				
+			}
+			
+			return false;
+			
+		},
+		
+		nullDataHandler: function() {
+			
+			console.log("SQL Query Succeeded");
+			
+		},
+		
+	};	
+});	
+        </script>
+    </body>
+</html>
