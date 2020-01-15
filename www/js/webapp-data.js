@@ -1853,7 +1853,7 @@ $j(function() {
                         $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
     
                     }
-                 }, 500);
+                 }, 1000);
 
                 
 
