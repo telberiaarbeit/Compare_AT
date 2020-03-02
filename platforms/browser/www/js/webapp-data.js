@@ -1227,11 +1227,11 @@ $j(function() {
                                             dcoachDB.importData();
 
                                         });
-                                        alert("Neues Update")
+                                        //alert("Neues Update")
 
                                     } else {
 
-                                        alert("Kein neues Update");
+                                        //alert("Kein neues Update");
 
                                         WEBAPPDB.transaction(
                                             function(transaction) {
@@ -1853,7 +1853,7 @@ $j(function() {
                         $j('.webapp-cproduct-name-value-5 .webapp-nested-attri-block').eq(h).height((maxHeight - 1));
     
                     }
-                 }, 500);
+                 }, 1000);
 
                 
 

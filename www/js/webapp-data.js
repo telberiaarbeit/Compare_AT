@@ -1227,11 +1227,11 @@ $j(function() {
                                             dcoachDB.importData();
 
                                         });
-                                        alert("Neues Update")
+                                        //alert("Neues Update")
 
                                     } else {
 
-                                        alert("Kein neues Update");
+                                        //alert("Kein neues Update");
 
                                         WEBAPPDB.transaction(
                                             function(transaction) {
