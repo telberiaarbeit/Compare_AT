@@ -42,7 +42,11 @@
 		  function onDeviceReady() {
 			  			  
 			  location.assign("selectproduct.html");
-		  }
+          }
+          
+          setTimeout(function () {
+            onDeviceReady()
+        }, 5000);
 		  
         </script>
     </body>
