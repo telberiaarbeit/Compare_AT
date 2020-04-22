@@ -1175,7 +1175,7 @@ $j(function() {
                                     }
 
                                     /* Product last update file information */
-                                    var productjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json"));
+                                    var productjson = new Date(urlDate("https://www.compare-cslb.at/assets/json/product.json"));
                                     var productupdatefile = productjson.toLocaleString("de");
 
                                     console.log(productjson + '--' + updatedate);
@@ -1185,7 +1185,7 @@ $j(function() {
                                     }
 
                                     /* Product attribute last update file information */
-                                    var productattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json"));
+                                    var productattributejson = new Date(urlDate("https://www.compare-cslb.at/assets/json/product_attribute.json"));
                                     var productattributeupdatefile = productattributejson.toLocaleString("de");
 
                                     console.log(productattributejson + '--' + updatedate);
@@ -1195,7 +1195,7 @@ $j(function() {
                                     }
 
                                     /* Product company last update file information */
-                                    var productcompanyjson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json"));
+                                    var productcompanyjson = new Date(urlDate("https://www.compare-cslb.at/assets/json/product_company.json"));
                                     var productcompanyupdatefile = productcompanyjson.toLocaleString("de");
 
                                     console.log(productcompanyjson + '--' + updatedate);
@@ -1205,7 +1205,7 @@ $j(function() {
                                     }
 
                                     /* Product company last update file information */
-                                    var productcompanyattributejson = new Date(urlDate("http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json"));
+                                    var productcompanyattributejson = new Date(urlDate("https://www.compare-cslb.at/assets/json/company_attribute.json"));
                                     var productcompanyupdatefile = productcompanyattributejson.toLocaleString("de");
 
                                     console.log(productcompanyattributejson + '--' + updatedate);
@@ -1227,11 +1227,11 @@ $j(function() {
                                             dcoachDB.importData();
 
                                         });
-                                        alert("Neues Update")
+                                        //alert("Neues Update")
 
                                     } else {
 
-                                        alert("Kein neues Update");
+                                        //alert("Kein neues Update");
 
                                         WEBAPPDB.transaction(
                                             function(transaction) {
@@ -1294,7 +1294,7 @@ $j(function() {
             //dcoachDB.syncData();
             var that = this;
 
-            var url = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product.json";
+            var url = "https://www.compare-cslb.at/assets/json/product.json";
             var productdata = [];
 
             $j.getJSON(url, function(data) {
@@ -1333,7 +1333,7 @@ $j(function() {
             /* INSERT PRODUCT COMPANY */
 
 
-            var url1 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_company.json";
+            var url1 = "https://www.compare-cslb.at/assets/json/product_company.json";
             var productdata1 = [];
 
 
@@ -1367,7 +1367,7 @@ $j(function() {
             /* INSERT PRODUCT ATTRIBUTE */
 
 
-            var url2 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/product_attribute.json";
+            var url2 = "https://www.compare-cslb.at/assets/json/product_attribute.json";
             var productdata2 = [];
 
             $j.getJSON(url2, function(data) {
@@ -1399,7 +1399,7 @@ $j(function() {
             /* INSERT COMPANY ATTRIBUTE */
 
 
-            var url3 = "http://product.compare.2281008-0401.anx-cus.net/assets/json/company_attribute.json";
+            var url3 = "https://www.compare-cslb.at/assets/json/company_attribute.json";
             var productselecteddata = [];
             var productdata3 = [];
 
@@ -1484,7 +1484,7 @@ $j(function() {
 
             var path = cordova.file.dataDirectory;
             var fileTransfer = new FileTransfer();
-            var uri = encodeURI("http://product.compare.2281008-0401.anx-cus.net/assets/images/product/" + remoteImages[count - 1]);
+            var uri = encodeURI("https://www.compare-cslb.at/assets/images/product/" + remoteImages[count - 1]);
 
             fileTransfer.download(
                 uri,
@@ -1975,12 +1975,12 @@ $j(function() {
                 var pdfdata = doc.output();
                 $j.ajax({
                     method: "POST",
-                    url: "http://product.compare.2281008-0401.anx-cus.net/pdf/pdf.php",
+                    url: "https://www.compare-cslb.at/pdf/pdf.php",
                     data: { data: pdfdata },
                 }).done(function(data) {
 
-                    //cordova.InAppBrowser.open('https://docs.google.com/viewer?url=https://docs.google.com/viewer?url=http://product.compare.2281008-0401.anx-cus.net/pdf/'+data, '_blank','location=yes');
-                    window.open('http://product.compare.2281008-0401.anx-cus.net/pdf/' + data, '_system', 'location=yes');
+                    //cordova.InAppBrowser.open('https://docs.google.com/viewer?url=https://docs.google.com/viewer?url=https://www.compare-cslb.at/pdf/'+data, '_blank','location=yes');
+                    window.open('https://www.compare-cslb.at/pdf/' + data, '_system', 'location=yes');
 
                 });
 
@@ -2103,11 +2103,11 @@ $j(function() {
 
                 $j.ajax({
                     method: "POST",
-                    url: "http://product.compare.2281008-0401.anx-cus.net/pdf/pdf.php",
+                    url: "https://www.compare-cslb.at/pdf/pdf.php",
                     data: { data: pdfdata },
                 }).done(function(data) {
 
-                    window.open('http://product.compare.2281008-0401.anx-cus.net/pdf/' + data, '_system', 'location=yes');
+                    window.open('https://www.compare-cslb.at/pdf/' + data, '_system', 'location=yes');
 
 
                 });

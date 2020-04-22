@@ -8,7 +8,7 @@
     </feature>
     <name>compare at</name>
     <description>compare at.</description>
-    <author email="support@phonegap.com" href="http://phonegap.com">Compare Team</author>
+    <author email="support@telberia.com" href="http://telberia.com">PhoneGap Team</author>
     <content src="index.html" />
     <icon src="icon.png" />
     <icon height="180" platform="ios" src="icon-60@3x.png" width="180" />
