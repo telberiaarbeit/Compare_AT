@@ -1,4 +1,4 @@
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.comparee.at" version="1.1.7">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.comparee.at" version="1.2.0">
   <name>compare at</name>
   <description>compare at.</description>
   <author href="http://telberia.com" email="support@telberia.com">PhoneGap Team</author>
